@@ -1,0 +1,106 @@
+# -*- coding: utf-8 -*-
+
+from abc import ABCMeta, abstractmethod, abstractproperty
+
+from eth_keyfile import create_keyfile_json, extract_key_from_keyfile
+
+from icon.utils.crypto import sign, create_key_pair
+from ..data import Address
+from ..exception import KeyStoreException
+
+
+class Wallet(metaclass=ABCMeta):
+    """An interface `Wallet` has 2 abstract methods, `get_address()` and `sign(hash: str)`."""
+
+    @abstractproperty
+    def address(self) -> Address:
+        pass
+
+    @abstractmethod
+    def sign(self, data: bytes) -> bytes:
+        """Generates signature from input data which is transaction data
+
+        :param data: data to be signed
+        :return signature: signature made from data and private key
+        """
+        raise NotImplementedError("Wallet implement this method")
+
+
+class KeyWallet(Wallet):
+    """KeyWallet class implements Wallet."""
+
+    def __init__(self, private_key: bytes = None):
+        self._private_key, self._public_key = create_key_pair(private_key)
+        self._address = Address.from_public_key(self._public_key)
+
+    @property
+    def private_key(self) -> bytes:
+        return self._private_key
+
+    @property
+    def public_key(self) -> bytes:
+        return self._public_key
+
+    @property
+    def address(self) -> Address:
+        return self._address
+
+    @staticmethod
+    def load(file_path: str, password: str) -> "KeyWallet":
+        """Loads a wallet from a keystore file with your password and generates an instance of Wallet.
+
+        :param file_path: File path of the keystore file. type(str)
+        :param password:
+            Password for the keystore file.
+            It must include alphabet character, number, and special character.
+        :return: An instance of Wallet class.
+        """
+        try:
+            with open(file_path, "rb") as file:
+                private_key: bytes = extract_key_from_keyfile(file, bytes(password, "utf-8"))
+                return KeyWallet(private_key)
+        except FileNotFoundError:
+            raise KeyStoreException("File is not found.")
+        except ValueError:
+            raise KeyStoreException("Password is wrong.")
+        except Exception as e:
+            raise KeyStoreException(f"keystore file error.{e}")
+
+    def save(self, file_path: str, password: str):
+        """Stores data of an instance of a derived wallet class on the file path with your password.
+
+        :param file_path: File path of the keystore file. type(str)
+        :param password:
+            Password for the keystore file. Password must include alphabet character, number, and special character.
+            type(str)
+        """
+        try:
+            key_store_contents = create_keyfile_json(
+                self._private_key,
+                password.encode("utf-8"),
+                iterations=16384,
+                kdf="scrypt"
+            )
+            key_store_contents["address"] = str(self._address)
+            key_store_contents["coinType"] = 'icx'
+
+            # validate the  contents of a keystore file.
+            # if is_keystore_file(key_store_contents):
+            #     json_string_keystore_data = json.dumps(key_store_contents)
+            #     store_keystore_file_on_the_path(file_path, json_string_keystore_data)
+        except FileExistsError:
+            raise KeyStoreException("File already exists.")
+        except PermissionError:
+            raise KeyStoreException("Not enough permission.")
+        except FileNotFoundError:
+            raise KeyStoreException("File not found.")
+        except IsADirectoryError:
+            raise KeyStoreException("Directory is invalid.")
+
+    def sign(self, data: bytes) -> bytes:
+        """Generates signature from input data which is transaction data
+
+        :param data: data to be signed
+        :return signature: signature made from input
+        """
+        return sign(data, self._private_key)
