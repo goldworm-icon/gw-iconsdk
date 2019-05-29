@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
+import json
+import os
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from eth_keyfile import create_keyfile_json, extract_key_from_keyfile
 
-from icon.utils.crypto import sign, create_key_pair
 from ..data import Address
 from ..exception import KeyStoreException
+from ..utils.crypto import sign, create_key_pair
+from ..utils.utils import is_keystore_file
 
 
 class Wallet(metaclass=ABCMeta):
@@ -75,19 +78,27 @@ class KeyWallet(Wallet):
             type(str)
         """
         try:
-            key_store_contents = create_keyfile_json(
+            key_store_contents: dict = create_keyfile_json(
                 self._private_key,
                 password.encode("utf-8"),
                 iterations=16384,
                 kdf="scrypt"
             )
             key_store_contents["address"] = str(self._address)
-            key_store_contents["coinType"] = 'icx'
+            key_store_contents["coinType"] = "icx"
 
             # validate the  contents of a keystore file.
-            # if is_keystore_file(key_store_contents):
-            #     json_string_keystore_data = json.dumps(key_store_contents)
-            #     store_keystore_file_on_the_path(file_path, json_string_keystore_data)
+            if not is_keystore_file(key_store_contents):
+                raise KeyStoreException("Invalid keystore")
+
+            text: str = json.dumps(key_store_contents)
+
+            if os.path.isfile(file_path):
+                raise FileExistsError
+
+            with open(file_path, "wt") as f:
+                f.write(text)
+
         except FileExistsError:
             raise KeyStoreException("File already exists.")
         except PermissionError:

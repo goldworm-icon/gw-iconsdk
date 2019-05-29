@@ -82,7 +82,7 @@ def serialize(params: dict) -> bytes:
         del copy_tx['signature']
 
     partial_serialized_params = __make_params_serialized(copy_tx)
-    return f"icx_sendTransaction.{partial_serialized_params}".encode()
+    return f"icx_sendTransaction.{partial_serialized_params}".encode("utf-8")
 
 
 def generate_message(params: dict):
@@ -92,8 +92,8 @@ def generate_message(params: dict):
     :param params: params in request for transaction.
     :return: the 256 bit hash digest of a message. Hexadecimal encoded.
     """
-    bytes_message_hash = serialize(params)
-    return sha3_256(bytes_message_hash).hexdigest()
+    message_hash: bytes = serialize(params)
+    return sha3_256(message_hash).hexdigest()
 
 
 def __get_key_name_for_tx_hash(params):
