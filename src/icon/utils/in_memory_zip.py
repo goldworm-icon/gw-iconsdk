@@ -13,27 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from io import BytesIO
-from os import path, walk
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from iconsdk.exception import ZipException
+from ..exception import ZipException
 
 
-def gen_deploy_data_content(_path: str) -> bytes:
+def gen_deploy_data_content(path: str) -> bytes:
     """Generate bytes of zip data of SCORE.
 
-    :param _path: Path of the directory to be zipped.
+    :param path: Path of the directory to be zipped.
     """
-    if path.isdir(_path) is False and path.isfile(_path) is False:
-        raise ValueError(f"Invalid path {_path}")
-    try:
-        memory_zip = InMemoryZip()
-        memory_zip.zip_in_memory(_path)
-    except ZipException:
-        raise ZipException(f"Can't zip SCORE contents")
-    else:
-        return memory_zip.data
+    if not os.path.isdir(path) and not os.path.isfile(path):
+        raise ValueError(f"Invalid path {path}")
+
+    memory_zip = InMemoryZip()
+    memory_zip.zip_in_memory(path)
+
+    return memory_zip.data
 
 
 class InMemoryZip:
@@ -48,40 +46,29 @@ class InMemoryZip:
 
         :return: zip data
         """
-        self._in_memory.seek(0)
-        return self._in_memory.read()
+        return self._in_memory.getvalue()
 
-    def zip_in_memory(self, _path):
+    def zip_in_memory(self, path: str):
         """Compress zip data (bytes) in memory.
 
-        :param _path: The path of the directory to be zipped.
+        :param path: The path of the directory to be zipped.
         """
         try:
+            path: str = os.path.abspath(path)
+
             # when it is a zip file
-            if path.isfile(_path):
-                zf = ZipFile(_path, 'r', ZIP_DEFLATED, False)
+            if os.path.isfile(path):
+                zf = ZipFile(path, "r", ZIP_DEFLATED, allowZip64=False)
                 zf.testzip()
-                with open(_path, mode='rb') as fp:
-                    fp.seek(0)
+                with open(path, mode="rb") as fp:
                     self._in_memory.seek(0)
                     self._in_memory.write(fp.read())
             else:
                 # root path for figuring out directory of tests
-                tmp_root = None
-                with ZipFile(self._in_memory, 'a', ZIP_DEFLATED, False) as zf:
-                    for root, folders, files in walk(_path):
-                        if 'package.json' in files:
-                            tmp_root = root
-                        if tmp_root and root.replace(tmp_root,'') == '/tests':
-                            continue
-                        if root.find('__pycache__') != -1:
-                            continue
-                        if root.find('/.') != -1:
-                            continue
+                with ZipFile(self._in_memory, "a", ZIP_DEFLATED, False) as zf:
+                    for root, folders, files in os.walk(path):
                         for file in files:
-                            if file.startswith('.'):
-                                continue
-                            full_path = path.join(root, file)
+                            full_path: str = os.path.join(root, file)
                             zf.write(full_path)
         except ZipException:
             raise ZipException

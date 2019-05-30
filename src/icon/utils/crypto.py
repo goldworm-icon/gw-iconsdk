@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ("sign", "create_key_pair")
+__all__ = ("sign", "create_key_pair", "extract_public_key")
 
 from secp256k1 import PrivateKey
 from typing import Tuple
