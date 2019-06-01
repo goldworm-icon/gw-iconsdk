@@ -36,7 +36,7 @@ def gen_deploy_data_content(path: str) -> bytes:
     return memory_zip.data
 
 
-class InMemoryZip:
+class InMemoryZip(object):
     """Class for compressing data in memory using zip and BytesIO."""
 
     def __init__(self):
@@ -50,11 +50,11 @@ class InMemoryZip:
         """
         return self._in_memory.getvalue()
 
-    def run(self, path: str):
+    def run(self, path: str, archive_root: str = "score"):
         if os.path.isfile(path):
             self._run_with_file(path)
         elif os.path.isdir(path):
-            self._run_with_dir(path)
+            self._run_with_dir(path, archive_root)
         else:
             raise ZipException(f"Invalid SCORE path: {path}")
 
@@ -66,24 +66,35 @@ class InMemoryZip:
             self._in_memory.seek(0)
             self._in_memory.write(fp.read())
 
-    def _run_with_dir(self, path: str):
+    def _run_with_dir(self, path: str, archive_root: str):
+        path: str = os.path.abspath(path)
         score_root: str = self.find_score_root(path, PACKAGE_JSON_FILE)
 
         with ZipFile(self._in_memory, "w", ZIP_DEFLATED, allowZip64=False) as zf:
             for root, dirs, files in os.walk(score_root):
-                if not self._is_dir_valid(root):
+                dirname: str = os.path.basename(root)
+                if not self._is_dirname_valid(dirname):
                     continue
 
-                arc_root: str = root.replace(score_root, "")
+                arc_root: str = root.replace(score_root, archive_root)
 
                 for file in files:
-                    if self._is_file_valid(file):
+                    if self._is_filename_valid(file):
                         full_path: str = os.path.join(root, file)
                         arcname: str = os.path.join(arc_root, file)
                         zf.write(full_path, arcname)
 
     @staticmethod
     def find_score_root(path: str, filename: str) -> str:
+        """Find the directory where a given file is located
+
+        If path
+
+        :param path:
+        :param filename:
+        :return:
+        """
+
         for root, dirs, files in os.walk(path):
             if filename in files:
                 return root
@@ -91,7 +102,7 @@ class InMemoryZip:
         raise ZipException(f"{filename} not found")
 
     @staticmethod
-    def _is_file_valid(filename: str) -> bool:
+    def _is_filename_valid(filename: str) -> bool:
         if filename.startswith("."):
             return False
         if filename == PACKAGE_JSON_FILE:
@@ -100,7 +111,7 @@ class InMemoryZip:
         return filename.endswith(".py")
 
     @staticmethod
-    def _is_dir_valid(dirname: str) -> bool:
+    def _is_dirname_valid(dirname: str) -> bool:
         excluded_dirnames = ("__pycache__", "tests")
 
         if dirname.startswith("."):
