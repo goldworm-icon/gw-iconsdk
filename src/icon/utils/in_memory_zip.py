@@ -15,9 +15,11 @@
 
 import os
 from io import BytesIO
+from typing import Optional
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from ..exception import ZipException
+from ..constant import PACKAGE_JSON_FILE
 
 
 def gen_deploy_data_content(path: str) -> bytes:
@@ -29,7 +31,7 @@ def gen_deploy_data_content(path: str) -> bytes:
         raise ValueError(f"Invalid path {path}")
 
     memory_zip = InMemoryZip()
-    memory_zip.zip_in_memory(path)
+    memory_zip.run(path)
 
     return memory_zip.data
 
@@ -38,7 +40,7 @@ class InMemoryZip:
     """Class for compressing data in memory using zip and BytesIO."""
 
     def __init__(self):
-        self._in_memory = BytesIO()
+        self._in_memory: Optional[BytesIO] = BytesIO()
 
     @property
     def data(self) -> bytes:
@@ -48,28 +50,62 @@ class InMemoryZip:
         """
         return self._in_memory.getvalue()
 
-    def zip_in_memory(self, path: str):
-        """Compress zip data (bytes) in memory.
+    def run(self, path: str):
+        if os.path.isfile(path):
+            self._run_with_file(path)
+        elif os.path.isdir(path):
+            self._run_with_dir(path)
+        else:
+            raise ZipException(f"Invalid SCORE path: {path}")
 
-        :param path: The path of the directory to be zipped.
-        """
-        try:
-            path: str = os.path.abspath(path)
+    def _run_with_file(self, path: str):
+        zf = ZipFile(path, "r", ZIP_DEFLATED, allowZip64=False)
+        zf.testzip()
 
-            # when it is a zip file
-            if os.path.isfile(path):
-                zf = ZipFile(path, "r", ZIP_DEFLATED, allowZip64=False)
-                zf.testzip()
-                with open(path, mode="rb") as fp:
-                    self._in_memory.seek(0)
-                    self._in_memory.write(fp.read())
-            else:
-                # root path for figuring out directory of tests
-                with ZipFile(self._in_memory, "a", ZIP_DEFLATED, False) as zf:
-                    for root, folders, files in os.walk(path):
-                        for file in files:
-                            full_path: str = os.path.join(root, file)
-                            zf.write(full_path)
-        except ZipException:
-            raise ZipException
+        with open(path, mode="rb") as fp:
+            self._in_memory.seek(0)
+            self._in_memory.write(fp.read())
 
+    def _run_with_dir(self, path: str):
+        score_root: str = self.find_score_root(path, PACKAGE_JSON_FILE)
+
+        with ZipFile(self._in_memory, "w", ZIP_DEFLATED, allowZip64=False) as zf:
+            for root, dirs, files in os.walk(score_root):
+                if not self._is_dir_valid(root):
+                    continue
+
+                arc_root: str = root.replace(score_root, "")
+
+                for file in files:
+                    if self._is_file_valid(file):
+                        full_path: str = os.path.join(root, file)
+                        arcname: str = os.path.join(arc_root, file)
+                        zf.write(full_path, arcname)
+
+    @staticmethod
+    def find_score_root(path: str, filename: str) -> str:
+        for root, dirs, files in os.walk(path):
+            if filename in files:
+                return root
+
+        raise ZipException(f"{filename} not found")
+
+    @staticmethod
+    def _is_file_valid(filename: str) -> bool:
+        if filename.startswith("."):
+            return False
+        if filename == PACKAGE_JSON_FILE:
+            return True
+
+        return filename.endswith(".py")
+
+    @staticmethod
+    def _is_dir_valid(dirname: str) -> bool:
+        excluded_dirnames = ("__pycache__", "tests")
+
+        if dirname.startswith("."):
+            return False
+        if dirname in excluded_dirnames:
+            return False
+
+        return True

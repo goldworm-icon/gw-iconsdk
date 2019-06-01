@@ -9,7 +9,7 @@ def test_in_memory_zip():
     path: str = os.path.join(parent_path, "data_to_zip")
 
     zip = InMemoryZip()
-    zip.zip_in_memory(path)
+    zip.run(path)
 
     with open("data.zip", "wb") as f:
         f.write(zip.data)
