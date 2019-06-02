@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-def is_keystore_file(keystore: dict) -> bool:
+def is_keystore_valid(keystore: dict) -> bool:
     """Checks data in a keystore file is valid.
     :return: type(bool)
         True: When format of the keystore is valid.
