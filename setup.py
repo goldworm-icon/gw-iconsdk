@@ -1,46 +1,62 @@
 # -*- coding: utf-8 -*-
+# Copyright 2020 ICON Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import os
 
 from setuptools import setup, find_packages
-from os import environ, path
 
-version = environ.get("VERSION")
+here = os.path.abspath(os.path.dirname(__file__))
 
-if version is None:
-    with open(path.join(".", "VERSION")) as version_file:
-        version = version_file.read().strip()
+about = {}
+with open(os.path.join(here, "src/icon", "__version__.py"), "r") as f:
+    exec(f.read(), about)
 
 with open("README.md", "r") as f:
     long_description = f.read()
 
 setup(
-    name="gwiconsdk",
-    version=version,
+    name=about["__title__"],
+    version=about["__version__"],
     package_dir={"": "src"},
-    description="Python version IconSDK made by goldworm",
+    description=about["__description__"],
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="goldworm",
-    author_email="goldworm@iconloop.com",
-    url="https://github.com/goldworm-icon/gw-iconsdk",
+    author=about["__author__"],
+    author_email=about["__author_email"],
+    url=about["__url__"],
     packages=find_packages(exclude=["tests*"]),
     test_suite="tests",
     install_requires=[
-         "eth-keyfile>=0.5.1",
-         "secp256k1>=0.13.2",
-         "multipledispatch>=0.5.0",
-         "requests>=2.20.0"
+        "eth-keyfile>=0.5.1",
+        "coincurve>=13.0.0",
+        "multipledispatch>=0.5.0",
+        "requests>=2.20.0"
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
     license="Apache License 2.0",
     classifiers=[
-         "Development Status :: 5 - Production/Stable",
-         "Intended Audience :: Developers",
-         "Intended Audience :: System Administrators",
-         "Natural Language :: English",
-         "License :: OSI Approved :: Apache Software License",
-         "Programming Language :: Python",
-         "Programming Language :: Python :: 3.6"
-         "Programming Language :: Python :: 3.7"
-     ]
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "Intended Audience :: System Administrators",
+        "Natural Language :: English",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8"
+    ]
 )
