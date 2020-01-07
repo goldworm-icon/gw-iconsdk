@@ -2,20 +2,20 @@
 
 import json
 import os
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod
 
 from eth_keyfile import create_keyfile_json, extract_key_from_keyfile
 
 from ..data import Address
 from ..exception import KeyStoreException
-from ..utils.crypto import sign, create_key_pair
-from ..utils.utils import is_keystore_file
+from ..utils.crypto import sign_recoverable, create_key_pair
+from ..utils.utils import is_keystore_valid
 
 
 class Wallet(metaclass=ABCMeta):
     """An interface `Wallet` has 2 abstract methods, `get_address()` and `sign(hash: str)`."""
 
-    @abstractproperty
+    @abstractmethod
     def address(self) -> Address:
         pass
 
@@ -27,6 +27,10 @@ class Wallet(metaclass=ABCMeta):
         :return signature: signature made from data and private key
         """
         raise NotImplementedError("Wallet implement this method")
+
+    @abstractmethod
+    def recoverable_sign(self, data: bytes) -> bytes:
+        pass
 
 
 class KeyWallet(Wallet):
@@ -78,35 +82,32 @@ class KeyWallet(Wallet):
             type(str)
         """
         try:
-            key_store_contents: dict = create_keyfile_json(
+            if os.path.isfile(file_path):
+                raise KeyStoreException("File already exists")
+
+            keystore: dict = create_keyfile_json(
                 self._private_key,
                 password.encode("utf-8"),
                 iterations=16384,
                 kdf="scrypt"
             )
-            key_store_contents["address"] = str(self._address)
-            key_store_contents["coinType"] = "icx"
+            keystore["address"] = str(self._address)
+            keystore["coinType"] = "icx"
 
             # validate the  contents of a keystore file.
-            if not is_keystore_file(key_store_contents):
+            if not is_keystore_valid(keystore):
                 raise KeyStoreException("Invalid keystore")
 
-            text: str = json.dumps(key_store_contents)
-
-            if os.path.isfile(file_path):
-                raise FileExistsError
-
             with open(file_path, "wt") as f:
+                text: str = json.dumps(keystore)
                 f.write(text)
 
-        except FileExistsError:
-            raise KeyStoreException("File already exists.")
         except PermissionError:
-            raise KeyStoreException("Not enough permission.")
+            raise KeyStoreException("Not enough permission")
         except FileNotFoundError:
-            raise KeyStoreException("File not found.")
+            raise KeyStoreException("File not found")
         except IsADirectoryError:
-            raise KeyStoreException("Directory is invalid.")
+            raise KeyStoreException("Directory is invalid")
 
     def sign(self, data: bytes) -> bytes:
         """Generates signature from input data which is transaction data
@@ -114,4 +115,7 @@ class KeyWallet(Wallet):
         :param data: data to be signed
         :return signature: signature made from input
         """
-        return sign(data, self._private_key)
+        return sign_recoverable(data, self._private_key)
+
+    def recoverable_sign(self, data: bytes) -> bytes:
+        raise NotImplementedError
