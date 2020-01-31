@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright 2019 ICON Foundation
+# Copyright 2018 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,25 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
+from abc import ABCMeta, abstractmethod
 
-from .dict import Dict
+from ..data.jsonrpc_request import JsonRpcRequest
+from ..data.jsonrpc_response import JsonRpcResponse
 
 
-class JsonRpcRequest(object):
-    def __init__(self, method: str, params: Dict = None, _id: int = 0):
-        self._version = "2.0"
-        self._method = method
-        self._params = params
-        self._id = _id
+class Provider(metaclass=ABCMeta):
+    """The provider defines how the IconService connects to Loopchain."""
 
-    @property
-    def params(self) -> Optional[Dict]:
-        return self._params
-
-    @property
-    def method(self) -> Optional[str]:
-        return self._method
-
-    def __str__(self) -> str:
-        pass
+    @abstractmethod
+    def send(self, request: JsonRpcRequest) -> JsonRpcResponse:
+        raise NotImplementedError("Providers must implement this method")

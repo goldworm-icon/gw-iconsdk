@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright 2019 ICON Foundation
+# Copyright 2020 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,25 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
-from .dict import Dict
+class Transaction(object):
+    pass
 
 
-class JsonRpcRequest(object):
-    def __init__(self, method: str, params: Dict = None, _id: int = 0):
-        self._version = "2.0"
-        self._method = method
-        self._params = params
-        self._id = _id
-
-    @property
-    def params(self) -> Optional[Dict]:
-        return self._params
-
-    @property
-    def method(self) -> Optional[str]:
-        return self._method
-
-    def __str__(self) -> str:
-        pass
+class SignedTransaction(Transaction):
+    def __init__(self):
+        super().__init__()

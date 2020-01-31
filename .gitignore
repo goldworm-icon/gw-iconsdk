@@ -106,3 +106,4 @@ venv.bak/
 # etc
 .idea/
 .*/
+*.zip

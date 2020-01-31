@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# Copyright 2019 ICON Foundation
+# Copyright 2020 ICON Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,26 +12,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from icon.data.jsonrpc_request import JsonRpcRequest
+from icon.data.jsonrpc_response import JsonRpcResponse
 
-from typing import Optional
-
-from .dict import Dict
+from icon.provider.provider import Provider
 
 
-class JsonRpcRequest(object):
-    def __init__(self, method: str, params: Dict = None, _id: int = 0):
-        self._version = "2.0"
-        self._method = method
-        self._params = params
-        self._id = _id
+class HTTPProvider(Provider):
+    def __init__(self):
+        pass
 
-    @property
-    def params(self) -> Optional[Dict]:
-        return self._params
-
-    @property
-    def method(self) -> Optional[str]:
-        return self._method
-
-    def __str__(self) -> str:
+    def send(self, request: JsonRpcRequest) -> JsonRpcResponse:
         pass
