@@ -35,7 +35,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     author=about["__author__"],
-    author_email=about["__author_email"],
+    author_email=about["__author_email__"],
     url=about["__url__"],
     packages=find_packages(exclude=["tests*"]),
     test_suite="tests",
