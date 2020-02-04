@@ -15,6 +15,6 @@
 # limitations under the License.
 
 
-class JsonRpcResponse(object):
+class RpcResponse(object):
     def __init__(self):
         pass

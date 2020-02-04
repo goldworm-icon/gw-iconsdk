@@ -19,12 +19,10 @@ from typing import Optional
 from .dict import Dict
 
 
-class JsonRpcRequest(object):
-    def __init__(self, method: str, params: Dict = None, _id: int = 0):
-        self._version = "2.0"
+class RpcRequest(object):
+    def __init__(self, method: str = None, params: Dict = None):
         self._method = method
         self._params = params
-        self._id = _id
 
     @property
     def params(self) -> Optional[Dict]:

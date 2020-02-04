@@ -12,8 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from icon.data.jsonrpc_request import JsonRpcRequest
-from icon.data.jsonrpc_response import JsonRpcResponse
+from icon.data.rpc_request import RpcRequest
+from icon.data.rpc_response import RpcResponse
 
 from icon.provider.provider import Provider
 
@@ -22,5 +22,5 @@ class HTTPProvider(Provider):
     def __init__(self):
         pass
 
-    def send(self, request: JsonRpcRequest) -> JsonRpcResponse:
+    def send(self, request: RpcRequest) -> RpcResponse:
         pass
