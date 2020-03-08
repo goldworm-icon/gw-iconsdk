@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
 if TYPE_CHECKING:
-    from .provider.provider import Provider
     from .data.block import Block
+    from .data.transaction import Transaction
     from .data.transaction_result import TransactionResult
-    from .data.transaction import SignedTransaction
+    from .provider.provider import Provider
 
 
 class Client(object):
@@ -29,7 +29,7 @@ class Client(object):
     def get_block(self) -> Block:
         pass
 
-    def get_transaction(self) -> SignedTransaction:
+    def get_transaction(self) -> Transaction:
         pass
 
     def get_transaction_result(self) -> TransactionResult:
@@ -41,11 +41,14 @@ class Client(object):
     def get_balance(self) -> int:
         pass
 
-    def get_score_api(self):
+    def get_score_api(self) -> Dict[str, str]:
         pass
 
     def send_transaction(self):
         pass
 
     def call(self):
+        pass
+
+    def estimate_step(self) -> int:
         pass
