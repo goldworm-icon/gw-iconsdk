@@ -1,3 +1,4 @@
 pytest
 secp256k1
 coincurve
+multipledispatch

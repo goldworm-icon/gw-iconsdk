@@ -13,12 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 from ..data.rpc_request import RpcRequest
 
+if TYPE_CHECKING:
+    from ..data.address import Address
 
-class Builder(object):
+
+class TransactionBuilder(object):
     """Helper to make it easy to create a RPC request message
 
     """
@@ -26,37 +29,34 @@ class Builder(object):
     def __init__(self, method: str):
         self._request = RpcRequest(method)
 
-    def method(self, method: str) -> 'Builder':
+    def version(self, version: int) -> 'TransactionBuilder':
         return self
 
-    def version(self, version: int) -> 'Builder':
+    def from_(self, from_: 'Address') -> 'TransactionBuilder':
         return self
 
-    def from_(self, from_: str) -> 'Builder':
+    def to(self, to: str) -> 'TransactionBuilder':
         return self
 
-    def to(self, to: str) -> 'Builder':
+    def value(self, value: int) -> 'TransactionBuilder':
         return self
 
-    def value(self, value: int) -> 'Builder':
+    def step_limit(self, step_limit: int) -> 'TransactionBuilder':
         return self
 
-    def step_limit(self, step_limit: int) -> 'Builder':
+    def timestamp(self, timestamp_us: int) -> 'TransactionBuilder':
         return self
 
-    def timestamp(self, timestamp_us: int) -> 'Builder':
+    def nid(self, nid: int) -> 'TransactionBuilder':
         return self
 
-    def nid(self, nid: int) -> 'Builder':
+    def signature(self, signature: bytes) -> 'TransactionBuilder':
         return self
 
-    def signature(self, signature: bytes) -> 'Builder':
+    def data_type(self, data_type: str) -> 'TransactionBuilder':
         return self
 
-    def data_type(self, data_type: str) -> 'Builder':
-        return self
-
-    def data(self, params: Union[dict, str]) -> 'Builder':
+    def data(self, params: Union[dict, str]) -> 'TransactionBuilder':
         return self
 
     def build(self) -> 'RpcRequest':
