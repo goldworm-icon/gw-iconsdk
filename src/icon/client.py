@@ -15,31 +15,49 @@
 
 from typing import TYPE_CHECKING, Dict
 
+from .builder.generic_builder import GenericBuilder
+from .builder.method import Method
+from .data.address import Address
+from .data.transaction_result import TransactionResult
+from .utils.convert_type import str_to_int
+
 if TYPE_CHECKING:
     from .data.block import Block
     from .data.transaction import Transaction
-    from .data.transaction_result import TransactionResult
     from .provider.provider import Provider
 
 
 class Client(object):
-    def __init__(self, provider: Provider):
+    def __init__(self, provider: "Provider"):
         self._provider = provider
 
-    def get_block(self) -> Block:
+    def get_block(self) -> "Block":
         pass
 
-    def get_transaction(self) -> Transaction:
+    def get_transaction(self) -> "Transaction":
         pass
 
-    def get_transaction_result(self) -> TransactionResult:
-        pass
+    def get_transaction_result(self, tx_hash: bytes) -> "TransactionResult":
+        builder = GenericBuilder(Method.GET_TRANSACTION_RESULT)
+        builder.add("txHash", tx_hash)
+        request = builder.build()
+
+        response = self._provider.send(request)
+        return TransactionResult.from_dict(response.result)
 
     def get_total_supply(self) -> int:
-        pass
+        builder = GenericBuilder(Method.GET_TOTAL_SUPPLY)
+        request = builder.build()
 
-    def get_balance(self) -> int:
-        pass
+        response = self._provider.send(request)
+        return str_to_int(response.result)
+
+    def get_balance(self, address: Address) -> int:
+        builder = GenericBuilder(Method.GET_BALANCE, {"address": address})
+        request = builder.build()
+
+        response = self._provider.send(request)
+        return str_to_int(response.result)
 
     def get_score_api(self) -> Dict[str, str]:
         pass

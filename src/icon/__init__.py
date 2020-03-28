@@ -13,4 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .builder.key import Key
+from .builder.method import Method
+from .client import Client
 from .provider.http_provider import HTTPProvider

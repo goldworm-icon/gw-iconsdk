@@ -13,8 +13,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Dict, Optional, Any, Union
 
 
 class RpcResponse(object):
-    def __init__(self):
-        pass
+    def __init__(self, json: Dict):
+        self._json = json
+
+    @property
+    def error(self) -> Optional[dict]:
+        return self._json.get("error")
+
+    @property
+    def result(self) -> Union[str, Dict]:
+        return self._json.get("result")

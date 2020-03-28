@@ -15,14 +15,15 @@
 # limitations under the License.
 
 from abc import abstractmethod
+from typing import Union
 
 from .object import Object
 
 
 class Primitive(Object):
-    def __init__(self, cls: type, value):
+    def __init__(self, cls: type, value: Union[bool, int, bytes]):
         self._cls = cls
-        self.value = value
+        self._value = value
 
     @property
     def value(self):

@@ -12,15 +12,57 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from icon.data.rpc_request import RpcRequest
-from icon.data.rpc_response import RpcResponse
 
-from icon.provider.provider import Provider
+import requests
+
+from ..data.rpc_request import RpcRequest
+from ..data.rpc_response import RpcResponse
+from ..provider.provider import Provider
 
 
 class HTTPProvider(Provider):
-    def __init__(self):
-        pass
+    def __init__(self, base_url: str, version: int = 3):
+        """
 
-    def send(self, request: RpcRequest) -> RpcResponse:
-        pass
+        :param base_url: ex) https://localhost:9000
+        """
+
+        self._base_url = base_url
+        self._version = version
+        self._hooks = {}
+
+        self._url = "/".join((self._base_url, "api", f"v{version}"))
+        self._debug_url = "/".join((self._base_url, "api", "debug", f"v{version}"))
+
+    @property
+    def base_url(self) -> str:
+        return self._base_url
+
+    @property
+    def version(self) -> int:
+        return self._version
+
+    def send(self, request: RpcRequest, **kwargs) -> RpcResponse:
+        url = self._url
+
+        response: requests.Response = requests.post(url, json=request.to_dict())
+
+        if "hooks" in kwargs:
+            self._dispatch_hook("response", kwargs["hooks"], response)
+
+        return RpcResponse(response.json())
+
+    @staticmethod
+    def _dispatch_hook(key: str, hooks, hook_data: requests.Response):
+        hooks = hooks or {}
+        hooks = hooks.get(key)
+        if not hooks:
+            return
+
+        if hasattr(hooks, "__call__"):
+            hooks = [hooks]
+
+        for hook in hooks:
+            _hook_data = hook(hook_data)
+            if _hook_data is not None:
+                hook_data = _hook_data

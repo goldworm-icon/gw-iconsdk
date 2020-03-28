@@ -22,7 +22,7 @@ import json
 
 from ..data.address import Address
 from .object import Object
-from .primitive import Primitive
+from ..utils.convert_type import to_str_dict
 
 _VALUE_TYPES = (bool, int, bytes, str, Address, MutableMapping)
 
@@ -71,4 +71,4 @@ class Dict(dict):
         pass
 
     def to_dict(self) -> dict:
-        return self
+        return to_str_dict(self)

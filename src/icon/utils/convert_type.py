@@ -39,6 +39,38 @@ def object_to_str(value) -> str:
     return value
 
 
+def to_str_list(o: list) -> list:
+    ret = []
+
+    for value in o:
+        if isinstance(value, dict):
+            value = to_str_dict(value)
+        elif isinstance(value, list):
+            value = to_str_list(value)
+        else:
+            value = object_to_str(value)
+
+        ret.append(value)
+
+    return ret
+
+
+def to_str_dict(o: dict) -> dict:
+    ret = {}
+
+    for key, value in o.items():
+        if isinstance(value, dict):
+            value = to_str_dict(value)
+        elif isinstance(value, list):
+            value = to_str_list(value)
+        else:
+            value = object_to_str(value)
+
+        ret[key] = value
+
+    return ret
+
+
 def str_to_object(object_type: str, value: str) -> object:
     if object_type == "Address":
         return Address.from_string(value)

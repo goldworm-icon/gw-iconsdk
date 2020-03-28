@@ -14,15 +14,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from threading import Lock
 from typing import Optional
 
 from .dict import Dict
+from ..utils.convert_type import to_str_dict
 
 
 class RpcRequest(object):
-    def __init__(self, method: str = None, params: Dict = None):
+    _next_id = 0
+    _id_lock = Lock()
+
+    def __init__(self, method: str, params: Dict):
+        self._id = self._get_next_id()
         self._method = method
+
+        if params is None:
+            params = {}
         self._params = params
+
+    @classmethod
+    def _get_next_id(cls) -> int:
+        with cls._id_lock:
+            _id = cls._next_id
+            cls._next_id = (cls._next_id + 1) % 0xffffffff
+
+        return _id
+
+    @property
+    def id(self) -> int:
+        return self._id
 
     @property
     def params(self) -> Optional[Dict]:
@@ -32,5 +53,14 @@ class RpcRequest(object):
     def method(self) -> Optional[str]:
         return self._method
 
-    def __str__(self) -> str:
-        pass
+    def to_dict(self) -> dict:
+        ret = {"method": self._method}
+
+        if self._params:
+            ret["params"] = self._params
+
+        ret = to_str_dict(ret)
+        ret["jsonrpc"] = "2.0"
+        ret["id"] = self._id
+
+        return ret
