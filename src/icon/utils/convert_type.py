@@ -40,6 +40,12 @@ def object_to_str(value) -> str:
 
 
 def to_str_list(o: list) -> list:
+    """Return a copied list from a given list
+
+    All items in the origin list are copied to a copied list and converted in string format
+    There is no change in a given list
+    """
+
     ret = []
 
     for value in o:

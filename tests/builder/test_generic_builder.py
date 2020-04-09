@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from icon.builder import Method
 from icon.builder.generic_builder import GenericBuilder
+from icon.builder.method import Method
 from icon.data.rpc_request import RpcRequest
 
 

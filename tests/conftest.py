@@ -41,7 +41,7 @@ def block_hash() -> bytes:
     return os.urandom(32)
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def address() -> 'Address':
     return Address(AddressPrefix.EOA, os.urandom(20))
 

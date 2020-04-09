@@ -15,49 +15,49 @@
 # limitations under the License.
 
 import pytest
-
-from icon.data.primitive import Bytes, Int, Bool
 from icon.data.address import Address
 from icon.data.dict import Dict
+from icon.data.primitive import Bytes, Int, Bool
 
 
-def test_int():
-    value: int = 100
-    int_object = Int(value)
-    assert int_object.value == value
-    assert int(int_object) == value
+@pytest.mark.skip
+class TestPrimitiveData(object):
 
-    value: int = 200
-    int_object.value = value
-    assert int_object.value == value
-    assert int(int_object) == value
+    def test_int(self):
+        value: int = 100
+        int_object = Int(value)
+        assert int_object.value == value
+        assert int(int_object) == value
 
+        value: int = 200
+        int_object.value = value
+        assert int_object.value == value
+        assert int(int_object) == value
 
-def test_int_type_error():
-    with pytest.raises(TypeError):
-        int_object = Int("hello")
-        int_object.value = 100
+    def test_int_type_error(self):
+        with pytest.raises(TypeError):
+            int_object = Int("hello")
+            int_object.value = 100
 
-    int_object = Int(100)
-    with pytest.raises(TypeError):
-        int_object.value = "abc"
+        int_object = Int(100)
+        with pytest.raises(TypeError):
+            int_object.value = "abc"
 
-
-def test_dict():
-    params = Dict()
-    params["value"] = 100
-    params["string"] = "hello"
-    params["bytes"] = Bytes(b"hello")
-    params["data"] = {
-        "method": "call",
-        "params": {
-            "address": Address.from_string("hxb31a79f6f53af0d524176d5ab0251556b69c87b6"),
-            "name": "apple",
-            "values": [Int(0), Int(1), Int(2)],
-            "on": Bool(True),
-            "off": Bool(False)
+    def test_dict(self):
+        params = Dict()
+        params["value"] = 100
+        params["string"] = "hello"
+        params["bytes"] = Bytes(b"hello")
+        params["data"] = {
+            "method": "call",
+            "params": {
+                "address": Address.from_string("hxb31a79f6f53af0d524176d5ab0251556b69c87b6"),
+                "name": "apple",
+                "values": [Int(0), Int(1), Int(2)],
+                "on": Bool(True),
+                "off": Bool(False)
+            }
         }
-    }
 
-    print(str(params))
-    print('{"value":"0x64"}')
+        print(str(params))
+        print('{"value":"0x64"}')
