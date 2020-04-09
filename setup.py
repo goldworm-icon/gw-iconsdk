@@ -27,6 +27,11 @@ with open(os.path.join(here, "src/icon", "__version__.py"), "r") as f:
 with open("README.md", "r") as f:
     long_description = f.read()
 
+with open("requirements.txt", "r") as f:
+    requires = list(f)
+
+tests_require = ["pytest", "secp256k1"]
+
 setup(
     name=about["__title__"],
     version=about["__version__"],
@@ -39,14 +44,9 @@ setup(
     url=about["__url__"],
     packages=find_packages(exclude=["tests*"]),
     test_suite="tests",
-    install_requires=[
-        "eth-keyfile>=0.5.1",
-        "coincurve>=13.0.0",
-        "multipledispatch>=0.5.0",
-        "requests>=2.20.0"
-    ],
+    install_requires=requires,
     setup_requires=["pytest-runner"],
-    tests_require=["pytest"],
+    tests_require=tests_require,
     license="Apache License 2.0",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -58,5 +58,5 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8"
-    ]
+    ],
 )
