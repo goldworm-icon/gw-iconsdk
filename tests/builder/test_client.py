@@ -23,8 +23,8 @@ class TestClient(object):
         "address, expected_balance",
         [
             ("hx1b8959dd5c57d2c502e22ee0a887d33baec09091", 907_829_600_000_000_000),
-            ("hxffffffffffffffffffffffffffffffffffffffff", 0)
-        ]
+            ("hxffffffffffffffffffffffffffffffffffffffff", 0),
+        ],
     )
     def test_get_balance(self, client, address, expected_balance):
         balance: int = client.get_balance(Address.from_string(address))
@@ -35,7 +35,7 @@ class TestClient(object):
         [
             "0xbb0242d6b0d1d44b7c50cbfb22073a71343bc9565da18c3f29665bc86b9f0ca5",
             "0x423495f33b5b2c3755f5fad2426b0d79a10cd43ade10d89ef9057ef0d90fe54e",
-        ]
+        ],
     )
     def test_get_transaction_result(self, client, tx_hash: str):
         tx_hash: bytes = hex_to_bytes(tx_hash)

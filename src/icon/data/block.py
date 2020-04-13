@@ -39,8 +39,20 @@ class Block(object):
     """Represents block information from
 
     """
-    def __init__(self, *, version: str, height: int, block_hash: bytes, prev_block_hash: bytes, timestamp: int,
-                 merkle_tree_root_hash: bytes, peer_id: Address, next_leader: Optional[Address], signature: bytes):
+
+    def __init__(
+        self,
+        *,
+        version: str,
+        height: int,
+        block_hash: bytes,
+        prev_block_hash: bytes,
+        timestamp: int,
+        merkle_tree_root_hash: bytes,
+        peer_id: Address,
+        next_leader: Optional[Address],
+        signature: bytes
+    ):
         self._version: str = version
         self._height: int = height
         self._hash: bytes = block_hash

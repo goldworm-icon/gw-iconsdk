@@ -104,10 +104,11 @@ class Address(Object):
 
         :return: bool
         """
-        return \
-            isinstance(other, Address) \
-            and self._prefix == other.prefix \
+        return (
+            isinstance(other, Address)
+            and self._prefix == other.prefix
             and self._body == other.body
+        )
 
     def __ne__(self, other) -> bool:
         """operator != overriding

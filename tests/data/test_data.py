@@ -22,7 +22,6 @@ from icon.data.primitive import Bytes, Int, Bool
 
 @pytest.mark.skip
 class TestPrimitiveData(object):
-
     def test_int(self):
         value: int = 100
         int_object = Int(value)
@@ -51,12 +50,14 @@ class TestPrimitiveData(object):
         params["data"] = {
             "method": "call",
             "params": {
-                "address": Address.from_string("hxb31a79f6f53af0d524176d5ab0251556b69c87b6"),
+                "address": Address.from_string(
+                    "hxb31a79f6f53af0d524176d5ab0251556b69c87b6"
+                ),
                 "name": "apple",
                 "values": [Int(0), Int(1), Int(2)],
                 "on": Bool(True),
-                "off": Bool(False)
-            }
+                "off": Bool(False),
+            },
         }
 
         print(str(params))

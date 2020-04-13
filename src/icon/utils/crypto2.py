@@ -33,7 +33,9 @@ def sign_recoverable(message: bytes, private_key: bytes) -> bytes:
     return private_key_object.sign_recoverable(message, hasher=None)
 
 
-def create_key_pair(private_key: bytes = None, compressed: bool = False) -> Tuple[bytes, bytes]:
+def create_key_pair(
+    private_key: bytes = None, compressed: bool = False
+) -> Tuple[bytes, bytes]:
     """
 
     :param private_key:

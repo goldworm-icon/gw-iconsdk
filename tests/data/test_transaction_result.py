@@ -18,10 +18,12 @@ from icon.utils.convert_type import bytes_to_hex
 
 
 class TestTransactionResult(object):
-    def test_from_dict_with_icx_transfer_tx(self, block_hash, tx_hash, address, step_price, logs_bloom):
-        block_height = 0xe65585
+    def test_from_dict_with_icx_transfer_tx(
+        self, block_hash, tx_hash, address, step_price, logs_bloom
+    ):
+        block_height = 0xE65585
         tx_index = 0x2
-        step_used = 0x186a0
+        step_used = 0x186A0
         cumulative_step_used = 0x12345678
         status = TransactionResult.Status.SUCCESS
 
@@ -36,7 +38,7 @@ class TestTransactionResult(object):
             "cumulativeStepUsed": hex(cumulative_step_used),
             "eventLogs": [],
             "logsBloom": bytes_to_hex(logs_bloom),
-            "status": hex(status)
+            "status": hex(status),
         }
 
         tx_result = TransactionResult.from_dict(data_in_dict)

@@ -37,7 +37,7 @@ class RpcRequest(object):
     def _get_next_id(cls) -> int:
         with cls._id_lock:
             _id = cls._next_id
-            cls._next_id = (cls._next_id + 1) % 0xffffffff
+            cls._next_id = (cls._next_id + 1) % 0xFFFFFFFF
 
         return _id
 

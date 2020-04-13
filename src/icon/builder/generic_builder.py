@@ -30,7 +30,10 @@ class GenericBuilder(object):
         self._request.params[key] = value
         return self
 
-    def set_data(self, data: Union[bytes, str, Dict[str, Union[bool, int, bytes, str, "Address"]]]):
+    def set_data(
+        self,
+        data: Union[bytes, str, Dict[str, Union[bool, int, bytes, str, "Address"]]],
+    ):
         self._request.params["data"] = data
         return self
 

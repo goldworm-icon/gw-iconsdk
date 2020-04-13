@@ -33,11 +33,15 @@ def sign_recoverable(message: bytes, private_key: bytes) -> bytes:
     """
     private_key_object = PrivateKey(private_key, raw=True, ctx=_ctx)
     recoverable_sign = private_key_object.ecdsa_sign_recoverable(message, raw=True)
-    sign_bytes, sign_recovery = private_key_object.ecdsa_recoverable_serialize(recoverable_sign)
-    return sign_bytes + sign_recovery.to_bytes(1, 'big')
+    sign_bytes, sign_recovery = private_key_object.ecdsa_recoverable_serialize(
+        recoverable_sign
+    )
+    return sign_bytes + sign_recovery.to_bytes(1, "big")
 
 
-def create_key_pair(private_key: bytes = None, compressed: bool = False) -> Tuple[bytes, bytes]:
+def create_key_pair(
+    private_key: bytes = None, compressed: bool = False
+) -> Tuple[bytes, bytes]:
     """
 
     :param private_key:

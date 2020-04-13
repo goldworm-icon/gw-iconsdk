@@ -11,10 +11,16 @@ class TestBlock(object):
     def test_from_dict_v0_5(self):
         version = "0.5"
         signature = "QotwNw1J7HufCDISyHSSMSPlomS07tM0fZzFfIWg8aRFW90zFfFfYrV1RnwwL1Bb0FEQ7tw4XIDfdNwq+pkHtgE="
-        block_hash: bytes = hex_to_bytes("c89185360aae47c3a3e633737414e3efce557af165ba976222dad1939e39aec0")
-        prev_block_hash: bytes = hex_to_bytes("a7fdb4d8207f832a2dbb716c0a5d43cf6f52fc69f375b36a02979b0233b43921")
+        block_hash: bytes = hex_to_bytes(
+            "c89185360aae47c3a3e633737414e3efce557af165ba976222dad1939e39aec0"
+        )
+        prev_block_hash: bytes = hex_to_bytes(
+            "a7fdb4d8207f832a2dbb716c0a5d43cf6f52fc69f375b36a02979b0233b43921"
+        )
         merkle_tree_root_hash: bytes = (
-            hex_to_bytes("49c072898557955cef50b2bc2e5a62e20ace4a49961624605a0994dbd62286c5")
+            hex_to_bytes(
+                "49c072898557955cef50b2bc2e5a62e20ace4a49961624605a0994dbd62286c5"
+            )
         )
         block_height: int = 17105728
         timestamp = 1586090680791618
@@ -41,15 +47,15 @@ class TestBlock(object):
                             "irep": "0x92b17680aa306dedeb8",
                             "rrep": "0x22f",
                             "totalDelegation": "0xc0b93aca28aac6ffb961a6",
-                            "value": "0x3f259eb7fcd16c91"
+                            "value": "0x3f259eb7fcd16c91",
                         },
                         "result": {
                             "coveredByFee": "0x3612df8756e000",
                             "coveredByOverIssuedICX": "0x0",
-                            "issue": "0x3eef8bd8757a8c91"
-                        }
+                            "issue": "0x3eef8bd8757a8c91",
+                        },
                     },
-                    "txHash": "0x368bc1a545e5e2d4b600439f996bdc0ec949bd3755bf3f7b1c57a0a57b4af526"
+                    "txHash": "0x368bc1a545e5e2d4b600439f996bdc0ec949bd3755bf3f7b1c57a0a57b4af526",
                 },
                 {
                     "version": "0x3",
@@ -64,12 +70,12 @@ class TestBlock(object):
                         "method": "bet_on_numbers",
                         "params": {
                             "numbers": "1,4,5,6,7,12,14,15,16,18,17,2,13,8,10,20,19,11",
-                            "user_seed": ""
-                        }
+                            "user_seed": "",
+                        },
                     },
                     "signature": "2nx+dUL8MPBroB96I22UsK/+wsU4Nfiyn+k4RhH6E7N4FtvyQgeC4LYdxw1oI4pIX3n6OaLxLFJcH2gOZu/s8wA=",
-                    "txHash": "0x926631ff8639daf7c6096081f2db13d9b1dbf5f46ffce209082c9fbb1e493a68"
-                }
+                    "txHash": "0x926631ff8639daf7c6096081f2db13d9b1dbf5f46ffce209082c9fbb1e493a68",
+                },
             ],
         }
 

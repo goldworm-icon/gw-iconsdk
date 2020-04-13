@@ -19,12 +19,7 @@ class TestConvertType(object):
             "data": b"hello",
             "address": address,
             "list": [0, True, "hello", b"good", address],
-            "params": {
-                "name": "banana",
-                "age": 20,
-                "single": True,
-                "address": address
-            }
+            "params": {"name": "banana", "age": 20, "single": True, "address": address},
         }
 
         expected = {
@@ -39,7 +34,7 @@ class TestConvertType(object):
                 "age": hex(d["params"]["age"]),
                 "single": hex(d["params"]["single"]),
                 "address": str(address),
-            }
+            },
         }
 
         ret = to_str_dict(d)

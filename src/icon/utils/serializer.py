@@ -17,18 +17,12 @@ from copy import deepcopy
 from hashlib import sha3_256
 from typing import Optional
 
-translator = str.maketrans({
-    "\\": "\\\\",
-    "{": "\\{",
-    "}": "\\}",
-    "[": "\\[",
-    "]": "\\]",
-    ".": "\\."
-})
+translator = str.maketrans(
+    {"\\": "\\\\", "{": "\\{", "}": "\\}", "[": "\\[", "]": "\\]", ".": "\\."}
+)
 
 
 def __make_params_serialized(json_data: dict) -> str:
-
     def encode(data) -> str:
         if isinstance(data, dict):
             return encode_dict(data)

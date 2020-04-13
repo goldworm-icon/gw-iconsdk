@@ -44,47 +44,49 @@ class TransactionResult(object):
             return self._message
 
         @classmethod
-        def from_dict(cls, data: Dict[str, str]) -> 'TransactionResult.Failure':
+        def from_dict(cls, data: Dict[str, str]) -> "TransactionResult.Failure":
             code = str_to_int(data["code"])
             message = data["message"]
 
             return cls(code, message)
 
-    def __init__(self,
-                 tx_hash: bytes = None,
-                 status: Status = Status.FAILURE,
-                 failure: Failure = None,
-                 tx_index: int = -1,
-                 to: 'Address' = None,
-                 block_height: int = -1,
-                 block_hash: bytes = None,
-                 cumulative_step_used: int = -1,
-                 step_price: int = -1,
-                 step_used: int = -1,
-                 score_address: 'Address' = None,
-                 logs_bloom: bytes = None,
-                 event_logs: List['EventLog'] = None):
-        self._status: Optional['TransactionResult.Status'] = status
-        self._failure: Optional['TransactionResult.Failure'] = failure
+    def __init__(
+        self,
+        tx_hash: bytes = None,
+        status: Status = Status.FAILURE,
+        failure: Failure = None,
+        tx_index: int = -1,
+        to: "Address" = None,
+        block_height: int = -1,
+        block_hash: bytes = None,
+        cumulative_step_used: int = -1,
+        step_price: int = -1,
+        step_used: int = -1,
+        score_address: "Address" = None,
+        logs_bloom: bytes = None,
+        event_logs: List["EventLog"] = None,
+    ):
+        self._status: Optional["TransactionResult.Status"] = status
+        self._failure: Optional["TransactionResult.Failure"] = failure
         self._tx_hash: bytes = tx_hash
         self._tx_index: int = tx_index
-        self._to: 'Address' = to
+        self._to: "Address" = to
         self._block_height: int = block_height
         self._block_hash: bytes = block_hash
         self._cumulative_step_used: int = cumulative_step_used
         self._step_price = step_price
         self._step_used = step_used
-        self._score_address: Optional['Address'] = score_address
+        self._score_address: Optional["Address"] = score_address
         self._fee = step_price * step_used
         self._logs_bloom: Optional[bytes] = logs_bloom
-        self._event_logs: List['EventLog'] = [] if event_logs is None else event_logs
+        self._event_logs: List["EventLog"] = [] if event_logs is None else event_logs
 
     @property
     def status(self) -> Status:
         return self._status
 
     @property
-    def failure(self) -> Optional['TransactionResult.Failure']:
+    def failure(self) -> Optional["TransactionResult.Failure"]:
         return self._failure
 
     @property
@@ -96,7 +98,7 @@ class TransactionResult(object):
         return self._tx_index
 
     @property
-    def to(self) -> 'Address':
+    def to(self) -> "Address":
         return self._to
 
     @property
@@ -120,7 +122,7 @@ class TransactionResult(object):
         return self._cumulative_step_used
 
     @property
-    def score_address(self) -> 'Address':
+    def score_address(self) -> "Address":
         return self._score_address
 
     @property
@@ -132,24 +134,32 @@ class TransactionResult(object):
         return self._logs_bloom
 
     @property
-    def event_logs(self) -> List['EventLog']:
+    def event_logs(self) -> List["EventLog"]:
         return self._event_logs
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'TransactionResult':
+    def from_dict(cls, data: dict) -> "TransactionResult":
         status = TransactionResult.Status(str_to_int(data["status"]))
-        failure = TransactionResult.Failure.from_dict(data["failure"]) if "failure" in data else None
+        failure = (
+            TransactionResult.Failure.from_dict(data["failure"])
+            if "failure" in data
+            else None
+        )
         tx_hash: bytes = hex_to_bytes(data["txHash"])
         tx_index: int = str_to_int(data["txIndex"])
-        to: 'Address' = Address.from_string(data["to"])
+        to: "Address" = Address.from_string(data["to"])
         block_height: int = str_to_int(data["blockHeight"])
         block_hash: bytes = hex_to_bytes(data["blockHash"])
         step_price: int = str_to_int(data["stepPrice"])
         step_used: int = str_to_int(data["stepUsed"])
         cumulative_step_used = str_to_int(data["cumulativeStepUsed"])
-        score_address = Address.from_string(data["scoreAddress"]) if "scoreAddress" in data else None
+        score_address = (
+            Address.from_string(data["scoreAddress"])
+            if "scoreAddress" in data
+            else None
+        )
         logs_bloom: bytes = hex_to_bytes(data.get("logsBloom"))
-        event_logs: List['EventLog'] = cls._parse_event_logs(data["eventLogs"])
+        event_logs: List["EventLog"] = cls._parse_event_logs(data["eventLogs"])
 
         return TransactionResult(
             status=status,
@@ -164,10 +174,11 @@ class TransactionResult(object):
             cumulative_step_used=cumulative_step_used,
             score_address=score_address,
             logs_bloom=logs_bloom,
-            event_logs=event_logs)
+            event_logs=event_logs,
+        )
 
     @classmethod
-    def _parse_event_logs(cls, event_logs: List[Dict[str, str]]) -> List['EventLog']:
+    def _parse_event_logs(cls, event_logs: List[Dict[str, str]]) -> List["EventLog"]:
         ret = []
         for log in event_logs:
             ret.append(EventLog.from_dict(log))

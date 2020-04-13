@@ -93,7 +93,7 @@ def str_to_object(object_type: str, value: str) -> object:
 
 
 def bytes_to_hex(value: bytes, prefix: str = "0x") -> str:
-    return f'{prefix}{value.hex()}'
+    return f"{prefix}{value.hex()}"
 
 
 def hex_to_bytes(value: Optional[str]) -> Optional[bytes]:

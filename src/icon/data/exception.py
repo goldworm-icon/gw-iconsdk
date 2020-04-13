@@ -5,7 +5,6 @@ from typing import Optional
 
 
 class SDKException(Exception):
-
     @unique
     class Code(IntEnum):
         OK = 0
@@ -18,7 +17,7 @@ class SDKException(Exception):
         URL_ERROR = 7
 
         def __str__(self) -> str:
-            return str(self.name).capitalize().replace('_', ' ')
+            return str(self.name).capitalize().replace("_", " ")
 
     def __init__(self, code: Code, message: Optional[str]):
         self._code = code

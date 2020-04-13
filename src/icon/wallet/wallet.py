@@ -64,7 +64,9 @@ class KeyWallet(Wallet):
         """
         try:
             with open(file_path, "rb") as file:
-                private_key: bytes = extract_key_from_keyfile(file, bytes(password, "utf-8"))
+                private_key: bytes = extract_key_from_keyfile(
+                    file, bytes(password, "utf-8")
+                )
                 return KeyWallet(private_key)
         except FileNotFoundError:
             raise KeyStoreException("File is not found.")
@@ -89,7 +91,7 @@ class KeyWallet(Wallet):
                 self._private_key,
                 password.encode("utf-8"),
                 iterations=16384,
-                kdf="scrypt"
+                kdf="scrypt",
             )
             keystore["address"] = str(self._address)
             keystore["coinType"] = "icx"

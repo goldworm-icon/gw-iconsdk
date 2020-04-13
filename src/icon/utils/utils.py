@@ -12,9 +12,11 @@ def is_keystore_valid(keystore: dict) -> bool:
     crypto_keys = ["ciphertext", "cipherparams", "cipher", "kdf", "kdfparams", "mac"]
     crypto_cipherparams_keys = ["iv"]
 
-    return has_keys(keystore, root_keys) \
-        and has_keys(keystore["crypto"], crypto_keys) \
+    return (
+        has_keys(keystore, root_keys)
+        and has_keys(keystore["crypto"], crypto_keys)
         and has_keys(keystore["crypto"]["cipherparams"], crypto_cipherparams_keys)
+    )
 
 
 def has_keys(target_data: dict, keys: list):
