@@ -1,23 +1,211 @@
 # -*- coding: utf-8 -*-
-# Copyright 2020 ICON Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+
+import base64
+import json
+from enum import IntEnum, auto
+from typing import Optional, Dict, Union, Any
+
+from .address import Address
+from ..utils.convert_type import str_to_int, hex_to_bytes, bytes_to_hex
+from .exception import JSONRPCException
+
+
+class DataType(IntEnum):
+    NONE = auto()
+    CALL = auto()
+    DEPLOY = auto()
+    MESSAGE = auto()
+
+    def __str__(self) -> str:
+        return self.name.lower()
 
 
 class Transaction(object):
-    pass
+    """Transaction class containing transaction information from
+    """
 
+    def __init__(
+        self,
+        version: int,
+        nid: int,
+        from_: Optional["Address"],
+        to: Optional["Address"],
+        step_limit: int,
+        timestamp: int,
+        signature: bytes,
+        block_height: int,
+        block_hash: bytes,
+        tx_hash: bytes,
+        tx_index: int,
+        value: int = 0,
+        nonce: Optional[int] = None,
+        data_type: Optional[str] = None,
+        data: Optional[Union[str, Dict]] = None,
+    ) -> None:
+        """Transaction class for icon score context
+        """
+        self._version = version
+        self._nid = nid
+        self._tx_hash = tx_hash
+        self._tx_index = tx_index
+        self._from = from_
+        self._to = to
+        self._step_limit = step_limit
+        self._value = value
+        self._timestamp = timestamp
+        self._signature = signature
+        self._block_height = block_height
+        self._block_hash = block_hash
+        self._nonce = nonce
+        self._data_type = data_type
+        self._data = data
 
-class SignedTransaction(Transaction):
-    def __init__(self):
-        super().__init__()
+    def __str__(self):
+        return (
+                f"version={self._version}\n"
+                f"nid={self._nid}\n"
+                f"block_hash={bytes_to_hex(self._block_hash)}\n"
+                f"block_height={self._block_height}\n"
+                f"tx_hash={bytes_to_hex(self._tx_hash)}\n"
+                f"tx_index={self._tx_index}\n"
+                f"from={self._from}\n"
+                f"to={self._to}\n"
+                f"value={self._value}\n"
+                f"timestamp={self._timestamp}\n"
+                f"signature={bytes_to_hex(self._signature)}\n"
+                f"data_type={self._data_type}"
+        )
+
+    @property
+    def version(self) -> int:
+        return self._version
+
+    @property
+    def nid(self) -> int:
+        return self._nid
+
+    @property
+    def from_(self) -> "Address":
+        """
+        The account who created the transaction.
+        """
+        return self._from
+
+    @property
+    def to(self) -> "Address":
+        """
+        The account of tx to.
+        """
+        return self._to
+
+    @property
+    def tx_index(self) -> int:
+        """
+        Transaction index in a block
+        """
+        return self._tx_index
+
+    @property
+    def tx_hash(self) -> bytes:
+        """
+        Transaction hash
+        """
+        return self._tx_hash
+
+    @property
+    def block_height(self) -> int:
+        return self._block_height
+
+    @property
+    def block_hash(self) -> bytes:
+        return self._block_hash
+
+    @property
+    def timestamp(self) -> int:
+        """
+        Timestamp of a transaction request in microseconds
+        This is NOT a block timestamp
+        """
+        return self._timestamp
+
+    @property
+    def nonce(self) -> Optional[int]:
+        """
+        (optional)
+        nonce of a transaction request.
+        random value
+        """
+        return self._nonce
+
+    @property
+    def value(self) -> int:
+        return self._value
+
+    @property
+    def data_type(self) -> Optional[str]:
+        return self._data_type
+
+    @property
+    def data(self) -> Optional[Any]:
+        return self._data
+
+    @property
+    def signature(self) -> bytes:
+        return self._signature
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> "Transaction":
+        data = json.loads(data)
+        return cls.from_dict(data)
+
+    @classmethod
+    def from_dict(cls, tx_dict: Dict[str, str]) -> "Transaction":
+        version = str_to_int(tx_dict["version"])
+        nid = str_to_int(tx_dict["nid"])
+        from_ = Address.from_string(tx_dict["from"])
+        to = Address.from_string(tx_dict["to"])
+        value = str_to_int(tx_dict.get("value", "0x0"))
+        tx_index = str_to_int(tx_dict["txIndex"])
+        tx_hash = hex_to_bytes(tx_dict["txHash"])
+        block_height = str_to_int(tx_dict["blockHeight"])
+        block_hash = hex_to_bytes(tx_dict["blockHash"])
+        step_limit = str_to_int(tx_dict["stepLimit"])
+        timestamp = cls._get_timestamp(tx_dict)
+        signature: bytes = base64.b64decode(tx_dict["signature"])
+        data_type = tx_dict.get("dataType")
+        nonce: int = cls._get_nonce(tx_dict.get("nonce"))
+        data: Any = cls._get_data(tx_dict)
+
+        return Transaction(
+            version=version,
+            nid=nid,
+            nonce=nonce,
+            from_=from_,
+            to=to,
+            value=value,
+            tx_index=tx_index,
+            tx_hash=tx_hash,
+            signature=signature,
+            block_height=block_height,
+            block_hash=block_hash,
+            step_limit=step_limit,
+            timestamp=timestamp,
+            data_type=data_type,
+            data=data,
+        )
+
+    @staticmethod
+    def _get_nonce(value: Optional[str]) -> Optional[int]:
+        return str_to_int(value) if value else None
+
+    @staticmethod
+    def _get_timestamp(tx_dict: Dict[str, str]) -> int:
+        for key in ("timestamp", "time_stamp"):
+            if key in tx_dict:
+                return str_to_int(tx_dict[key])
+
+        raise JSONRPCException("No timestamp in transaction")
+
+    @staticmethod
+    def _get_data(tx_dict: Dict) -> Any:
+        return None

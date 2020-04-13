@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, Dict
 from .builder.generic_builder import GenericBuilder
 from .builder.method import Method
 from .data.address import Address
+from .data.transaction import Transaction
 from .data.transaction_result import TransactionResult
 from .utils.convert_type import str_to_int
 
@@ -34,8 +35,13 @@ class Client(object):
     def get_block(self) -> "Block":
         pass
 
-    def get_transaction(self) -> "Transaction":
-        pass
+    def get_transaction(self, tx_hash: bytes) -> "Transaction":
+        builder = GenericBuilder(Method.GET_TRANSACTION_BY_HASH)
+        builder.add("txHash", tx_hash)
+        request = builder.build()
+
+        response = self._provider.send(request)
+        return Transaction.from_dict(response.result)
 
     def get_transaction_result(self, tx_hash: bytes) -> "TransactionResult":
         builder = GenericBuilder(Method.GET_TRANSACTION_RESULT)
