@@ -15,9 +15,8 @@
 # limitations under the License.
 
 from threading import Lock
-from typing import Optional
+from typing import Optional, Any, Dict
 
-from .dict import Dict
 from ..utils.convert_type import to_str_dict
 
 
@@ -25,7 +24,7 @@ class RpcRequest(object):
     _next_id = 0
     _id_lock = Lock()
 
-    def __init__(self, method: str, params: Dict):
+    def __init__(self, method: str, params: Optional[Dict[str, Any]]):
         self._id = self._get_next_id()
         self._method = method
 

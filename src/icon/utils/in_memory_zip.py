@@ -28,7 +28,7 @@ def gen_deploy_data_content(path: str) -> bytes:
     :param path: Path of the directory to be zipped.
     """
     if not os.path.isdir(path) and not os.path.isfile(path):
-        raise ValueError(f"Invalid path {path}")
+        raise ValueError(f"Invalid path: {path}")
 
     memory_zip = InMemoryZip()
     memory_zip.run(path)

@@ -13,10 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING, Union, Dict
+from typing import TYPE_CHECKING, Union, Dict, Any
+
+from icon.data.exception import CallException, DataTypeException
 
 from .generic_builder import GenericBuilder
 from .key import Key, KeyFlag
+from ..utils.in_memory_zip import gen_deploy_data_content
 from ..utils.serializer import generate_message, generate_message_hash
 
 if TYPE_CHECKING:
@@ -28,8 +31,8 @@ class TransactionBuilder(GenericBuilder):
 
     """
 
-    def __init__(self, method: str):
-        super().__init__(method)
+    def __init__(self):
+        super().__init__()
         self._flags: KeyFlag = KeyFlag.NONE
 
     def _set_flag(self, flag: KeyFlag, on: bool):
@@ -43,7 +46,7 @@ class TransactionBuilder(GenericBuilder):
         self._set_flag(KeyFlag.VERSION, True)
         return self
 
-    def from_(self, from_: "Address") -> "TransactionBuilder":
+    def from_(self, from_: Address) -> "TransactionBuilder":
         self.add(Key.FROM, from_)
         self._set_flag(KeyFlag.FROM, True)
         return self
@@ -83,15 +86,70 @@ class TransactionBuilder(GenericBuilder):
         self._set_flag(KeyFlag.DATA_TYPE, True)
         return self
 
-    def data(self, data: Union[Dict, str]) -> "TransactionBuilder":
+    def data(self, data: Union[Dict[str, Any], str]) -> "TransactionBuilder":
         self.add(Key.DATA, data)
         self._set_flag(KeyFlag.DATA, True)
         return self
 
     def generate_message(self) -> str:
-        params: dict = self._request.params.to_dict()
-        return generate_message(params)
+        return generate_message(self._params)
 
     def generate_message_hash(self) -> bytes:
-        params: dict = self._request.params.to_dict()
-        return generate_message_hash(params)
+        return generate_message_hash(self._params)
+
+
+class CallTransactionBuilder(TransactionBuilder):
+    def __init__(self, method: str):
+        super().__init__()
+        super().data_type("call")
+        self._data: Dict[str, Any] = {"method": method}
+
+    def data(self, data: Union[Dict[str, Any], str]):
+        raise CallException(f"data() is not allowed in {self.__class__.__name__}")
+
+    def method(self, method: str) -> "CallTransactionBuilder":
+        self._data["method"] = method
+        return self
+
+    def params(self, params: Dict[str, Any]) -> "CallTransactionBuilder":
+        if not isinstance(params, dict):
+            raise DataTypeException(f"params must be dict type: {params}")
+
+        self._data["params"] = params
+        return self
+
+    def build(self):
+        super().data(self._data)
+        self._data = None
+
+        return super().build()
+
+
+class DeployTransactionBuilder(TransactionBuilder):
+    def __init__(self):
+        super().__init__()
+        super().data_type("deploy")
+        self._data: Dict[str, Any] = {}
+
+    def data(self, data: Union[Dict[str, Any], str]):
+        raise CallException(f"data() is not allowed in {self.__class__.__name__}")
+
+    def content_from_bytes(self, data: bytes) -> "DeployTransactionBuilder":
+        self._data["content"] = data
+        self._data["contentType"] = "application/zip"
+        return self
+
+    def content_from_path(self, path: str) -> "DeployTransactionBuilder":
+        data: bytes = gen_deploy_data_content(path)
+        return self.content_from_bytes(data)
+
+    def params(self, params: Dict[str, Any]) -> "DeployTransactionBuilder":
+        if not isinstance(params, dict):
+            raise DataTypeException(f"params must be dict type: {params}")
+
+        self._data["params"] = params
+        return self
+
+    def build(self):
+        super().data(self._data)
+        return super().build()

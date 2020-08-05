@@ -15,6 +15,7 @@ class SDKException(Exception):
         JSON_RPC_ERROR = 5
         ZIP_MEMORY_ERROR = 6
         URL_ERROR = 7
+        CALL_ERROR = 8
 
         def __str__(self) -> str:
             return str(self.name).capitalize().replace("_", " ")
@@ -82,3 +83,10 @@ class URLException(SDKException):
 
     def __init__(self, message: Optional[str]):
         super().__init__(SDKException.Code.URL_ERROR, message)
+
+
+class CallException(SDKException):
+    """Error for sdk method misuse
+    """
+    def __init__(self, message: Optional[str]):
+        super().__init__(SDKException.Code.CALL_ERROR, message)
