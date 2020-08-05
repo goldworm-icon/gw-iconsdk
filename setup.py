@@ -21,7 +21,7 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 
 about = {}
-with open(os.path.join(here, "src/icon", "__version__.py"), "r") as f:
+with open(os.path.join(here, "src/icon", "__about__.py"), "r") as f:
     exec(f.read(), about)
 
 with open("README.md", "r") as f:
@@ -30,7 +30,7 @@ with open("README.md", "r") as f:
 with open("requirements.txt", "r") as f:
     requires = list(f)
 
-tests_require = ["pytest", "secp256k1"]
+tests_require = ["pytest"]
 
 setup(
     name=about["__title__"],

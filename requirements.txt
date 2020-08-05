@@ -1,5 +1,4 @@
-pytest~=5.4.1
-requests~=2.23.0
-secp256k1
-coincurve~=13.0.0
-multipledispatch~=0.6.0
+pytest
+requests
+coincurve
+multipledispatch
