@@ -19,6 +19,7 @@ from typing import Callable
 
 import pytest
 from icon.data.address import Address, AddressPrefix
+from icon.wallet.wallet import KeyWallet
 
 
 @pytest.fixture(scope="function")
@@ -69,3 +70,8 @@ def timestamp() -> int:
 @pytest.fixture
 def logs_bloom() -> bytes:
     return os.urandom(256)
+
+
+@pytest.fixture
+def wallet() -> KeyWallet:
+    return KeyWallet()

@@ -7,7 +7,7 @@ from abc import ABCMeta, abstractmethod
 from eth_keyfile import create_keyfile_json, extract_key_from_keyfile
 
 from ..data import Address
-from ..exception import KeyStoreException
+from ..data.exception import KeyStoreException
 from ..utils.crypto import sign_recoverable, create_key_pair
 from ..utils.utils import is_keystore_valid
 

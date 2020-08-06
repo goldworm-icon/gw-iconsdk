@@ -16,5 +16,3 @@
 
 
 from .address import Address, AddressPrefix
-from .primitive import *
-from .dict import Dict

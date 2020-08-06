@@ -13,17 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING, Union, Dict, Any
-
-from icon.data.exception import CallException, DataTypeException
+from base64 import standard_b64encode
+from typing import Union, Dict, Any, Optional
 
 from .generic_builder import GenericBuilder
 from .key import Key, KeyFlag
+from ..data.address import Address
+from ..data.exception import CallException, DataTypeException
+from ..utils.crypto2 import sign_recoverable
 from ..utils.in_memory_zip import gen_deploy_data_content
 from ..utils.serializer import generate_message, generate_message_hash
-
-if TYPE_CHECKING:
-    from ..data.address import Address
 
 
 class TransactionBuilder(GenericBuilder):
@@ -51,7 +50,7 @@ class TransactionBuilder(GenericBuilder):
         self._set_flag(KeyFlag.FROM, True)
         return self
 
-    def to(self, to: str) -> "TransactionBuilder":
+    def to(self, to: Address) -> "TransactionBuilder":
         self.add(Key.TO, to)
         self._set_flag(KeyFlag.TO, True)
         return self
@@ -97,6 +96,20 @@ class TransactionBuilder(GenericBuilder):
     def generate_message_hash(self) -> bytes:
         return generate_message_hash(self._params)
 
+    def build_and_sign(self, private_key: bytes) -> Dict[str, str]:
+        params: Dict[str, str] = super().build()
+
+        if Key.SIGNATURE not in params:
+            params[Key.SIGNATURE] = self._sign(private_key, params)
+
+        return params
+
+    @classmethod
+    def _sign(cls, private_key: bytes, params: Dict[str, str]) -> Optional[str]:
+        message_hash: bytes = generate_message_hash(params)
+        sign: bytes = sign_recoverable(message_hash, private_key)
+        return standard_b64encode(sign).decode("utf-8")
+
 
 class CallTransactionBuilder(TransactionBuilder):
     def __init__(self, method: str):
@@ -118,11 +131,9 @@ class CallTransactionBuilder(TransactionBuilder):
         self._data["params"] = params
         return self
 
-    def build(self):
+    def build_and_sign(self, private_key: bytes) -> Dict[str, str]:
         super().data(self._data)
-        self._data = None
-
-        return super().build()
+        return super().build_and_sign(private_key)
 
 
 class DeployTransactionBuilder(TransactionBuilder):
@@ -150,6 +161,6 @@ class DeployTransactionBuilder(TransactionBuilder):
         self._data["params"] = params
         return self
 
-    def build(self):
+    def build_and_sign(self, private_key: bytes) -> Dict[str, str]:
         super().data(self._data)
         return super().build()

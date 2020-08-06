@@ -16,6 +16,8 @@
 import copy
 from typing import Dict, Any
 
+from ..utils.convert_type import to_str_dict
+
 
 class GenericBuilder(object):
     def __init__(self, params: Dict[str, Any] = None):
@@ -25,5 +27,5 @@ class GenericBuilder(object):
         self._params[key] = value
         return self
 
-    def build(self) -> Dict[str, Any]:
-        return copy.deepcopy(self._params)
+    def build(self) -> Dict[str, str]:
+        return to_str_dict(copy.deepcopy(self._params))
