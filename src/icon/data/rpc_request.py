@@ -8,7 +8,7 @@ class RpcRequest(object):
     _next_id = 0
     _id_lock = Lock()
 
-    def __init__(self, method: str, params: Optional[Dict[str, str]]):
+    def __init__(self, method: str, params: Optional[Dict[str, str]] = None):
         self._id = self._get_next_id()
         self._method = method
         self._params = params

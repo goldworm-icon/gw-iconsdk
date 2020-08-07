@@ -88,5 +88,6 @@ class URLException(SDKException):
 class CallException(SDKException):
     """Error for sdk method misuse
     """
+
     def __init__(self, message: Optional[str]):
         super().__init__(SDKException.Code.CALL_ERROR, message)

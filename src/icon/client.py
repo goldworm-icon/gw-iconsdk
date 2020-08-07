@@ -13,19 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING, Dict
+from typing import Dict
 
 from .builder.generic_builder import GenericBuilder
 from .builder.method import Method
 from .data.address import Address
+from .data.block import Block
+from .data.rpc_request import RpcRequest
 from .data.transaction import Transaction
 from .data.transaction_result import TransactionResult
+from .provider.provider import Provider
 from .utils.convert_type import str_to_int
-
-if TYPE_CHECKING:
-    from .data.block import Block
-    from .data.transaction import Transaction
-    from .provider.provider import Provider
 
 
 class Client(object):
@@ -38,29 +36,29 @@ class Client(object):
     def get_transaction(self, tx_hash: bytes) -> "Transaction":
         builder = GenericBuilder(Method.GET_TRANSACTION_BY_HASH)
         builder.add("txHash", tx_hash)
-        request = builder.build()
+        params: Dict[str, str] = builder.build()
 
-        response = self._provider.send(request)
+        response = self._provider.send(
+            RpcRequest(Method.GET_TRANSACTION_BY_HASH, params)
+        )
         return Transaction.from_dict(response.result)
 
-    def get_transaction_result(self, tx_hash: bytes) -> "TransactionResult":
+    def get_transaction_result(self, tx_hash: bytes) -> TransactionResult:
         builder = GenericBuilder(Method.GET_TRANSACTION_RESULT)
         builder.add("txHash", tx_hash)
-        request = builder.build()
+        params: Dict[str, str] = builder.build()
 
+        request = RpcRequest(Method.GET_TRANSACTION_RESULT, params)
         response = self._provider.send(request)
         return TransactionResult.from_dict(response.result)
 
     def get_total_supply(self) -> int:
-        builder = GenericBuilder(Method.GET_TOTAL_SUPPLY)
-        request = builder.build()
-
+        request = RpcRequest(Method.GET_TOTAL_SUPPLY)
         response = self._provider.send(request)
         return str_to_int(response.result)
 
     def get_balance(self, address: Address) -> int:
-        builder = GenericBuilder(Method.GET_BALANCE, {"address": address})
-        request = builder.build()
+        request = RpcRequest(Method.GET_BALANCE, {"address": str(address)})
 
         response = self._provider.send(request)
         return str_to_int(response.result)

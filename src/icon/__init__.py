@@ -15,5 +15,7 @@
 
 from .builder.key import Key
 from .builder.method import Method
+from .builder.query_builder import *
+from .builder.transaction_builder import *
 from .client import Client
 from .provider.http_provider import HTTPProvider

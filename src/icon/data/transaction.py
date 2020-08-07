@@ -62,18 +62,18 @@ class Transaction(object):
 
     def __str__(self):
         return (
-                f"version={self._version}\n"
-                f"nid={self._nid}\n"
-                f"block_hash={bytes_to_hex(self._block_hash)}\n"
-                f"block_height={self._block_height}\n"
-                f"tx_hash={bytes_to_hex(self._tx_hash)}\n"
-                f"tx_index={self._tx_index}\n"
-                f"from={self._from}\n"
-                f"to={self._to}\n"
-                f"value={self._value}\n"
-                f"timestamp={self._timestamp}\n"
-                f"signature={bytes_to_hex(self._signature)}\n"
-                f"data_type={self._data_type}"
+            f"version={self._version}\n"
+            f"nid={self._nid}\n"
+            f"block_hash={bytes_to_hex(self._block_hash)}\n"
+            f"block_height={self._block_height}\n"
+            f"tx_hash={bytes_to_hex(self._tx_hash)}\n"
+            f"tx_index={self._tx_index}\n"
+            f"from={self._from}\n"
+            f"to={self._to}\n"
+            f"value={self._value}\n"
+            f"timestamp={self._timestamp}\n"
+            f"signature={bytes_to_hex(self._signature)}\n"
+            f"data_type={self._data_type}"
         )
 
     @property

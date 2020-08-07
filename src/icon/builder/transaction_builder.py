@@ -13,9 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+__all__ = (
+    "TransactionBuilder",
+    "CallTransactionBuilder",
+    "DeployTransactionBuilder"
+)
+
 from base64 import standard_b64encode
+from time import time_ns
 from typing import Union, Dict, Any, Optional
 
+from . import PROTO_VERSION
 from .generic_builder import GenericBuilder
 from .key import Key, KeyFlag
 from ..data.address import Address
@@ -33,6 +41,8 @@ class TransactionBuilder(GenericBuilder):
     def __init__(self):
         super().__init__()
         self._flags: KeyFlag = KeyFlag.NONE
+
+        self.version(PROTO_VERSION)
 
     def _set_flag(self, flag: KeyFlag, on: bool):
         if on:
@@ -97,6 +107,10 @@ class TransactionBuilder(GenericBuilder):
         return generate_message_hash(self._params)
 
     def build_and_sign(self, private_key: bytes) -> Dict[str, str]:
+        if Key.TIMESTAMP not in self._params:
+            time_us = time_ns() * 1000
+            self.timestamp(time_us)
+
         params: Dict[str, str] = super().build()
 
         if Key.SIGNATURE not in params:
