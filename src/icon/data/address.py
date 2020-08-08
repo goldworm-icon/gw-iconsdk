@@ -17,8 +17,8 @@
 """functions and classes to handle address
 """
 
-from enum import IntEnum
 import hashlib
+from enum import IntEnum
 
 from .object import Object
 
@@ -135,8 +135,8 @@ class Address(Object):
         """
         return self._prefix is AddressPrefix.CONTRACT
 
-    @staticmethod
-    def from_string(address: str) -> "Address":
+    @classmethod
+    def from_string(cls, address: str) -> "Address":
         """
         creates an address object from given 42-char string `address`
 
@@ -152,8 +152,8 @@ class Address(Object):
 
         return Address(prefix, body)
 
-    @staticmethod
-    def from_public_key(public_key: bytes) -> "Address":
+    @classmethod
+    def from_public_key(cls, public_key: bytes) -> "Address":
         if not isinstance(public_key, bytes):
             raise TypeError("Invalid type")
         if not (len(public_key) == 65 and public_key[0] == 0x04):
@@ -161,3 +161,7 @@ class Address(Object):
 
         body: bytes = hashlib.sha3_256(public_key[1:]).digest()[-20:]
         return Address(AddressPrefix.EOA, body)
+
+    @classmethod
+    def from_int(cls, prefix: AddressPrefix, value: int) -> "Address":
+        return Address(prefix, value.to_bytes(20, "big"))

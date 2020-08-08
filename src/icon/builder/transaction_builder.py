@@ -28,7 +28,7 @@ from .generic_builder import GenericBuilder
 from .key import Key, KeyFlag
 from ..data.address import Address
 from ..data.exception import CallException, DataTypeException
-from ..utils.crypto2 import sign_recoverable
+from ..utils.crypto import sign_recoverable
 from ..utils.in_memory_zip import gen_deploy_data_content
 from ..utils.serializer import generate_message, generate_message_hash
 

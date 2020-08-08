@@ -13,8 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from base64 import standard_b64encode
 from typing import Dict, Any
 
+from .builder.key import Key
 from .builder.method import Method
 from .data.address import Address
 from .data.block import Block
@@ -24,6 +26,8 @@ from .data.transaction import Transaction
 from .data.transaction_result import TransactionResult
 from .provider.provider import Provider
 from .utils.convert_type import str_to_int, bytes_to_hex, hex_to_bytes
+from .utils.crypto import sign_recoverable
+from .utils.serializer import generate_message_hash
 
 
 class Client(object):
@@ -77,9 +81,21 @@ class Client(object):
         response = self._send(Method.GET_SCORE_API, params)
         return response.result
 
-    def send_transaction(self, params: Dict[str, str] = None) -> bytes:
+    def send_transaction(self, params: Dict[str, str], private_key: bytes = None) -> bytes:
+        if not isinstance(params, dict):
+            ValueError(f"Invalid params: params={params}")
+
+        if isinstance(private_key, bytes):
+            params[Key.SIGNATURE] = self._sign(params, private_key)
+
         response = self._send(Method.SEND_TRANSACTION, params)
         return hex_to_bytes(response.result)
+
+    @classmethod
+    def _sign(cls, params: Dict[str, str], private_key: bytes) -> str:
+        message_hash: bytes = generate_message_hash(params)
+        signature: bytes = sign_recoverable(message_hash, private_key)
+        return standard_b64encode(signature).decode("utf-8")
 
     def call(self, params: Dict[str, str]) -> Dict[str, str]:
         response = self._send(Method.CALL, params)

@@ -15,11 +15,9 @@
 
 __all__ = ("sign_recoverable", "create_key_pair", "extract_public_key")
 
-from secp256k1 import PrivateKey
 from typing import Tuple
 
-_private_key_object = PrivateKey()
-_ctx = _private_key_object.ctx
+from coincurve import PrivateKey
 
 
 def sign_recoverable(message: bytes, private_key: bytes) -> bytes:
@@ -27,16 +25,12 @@ def sign_recoverable(message: bytes, private_key: bytes) -> bytes:
     Generates on the ECDSA-SHA256 signature in bytes from data.
     It refers to a document on https://github.com/ludbb/secp256k1-py.
 
-    :param message: data to sign
+    :param message: message to sign
     :param private_key: private key
     :return signature: signature made from input data
     """
-    private_key_object = PrivateKey(private_key, raw=True, ctx=_ctx)
-    recoverable_sign = private_key_object.ecdsa_sign_recoverable(message, raw=True)
-    sign_bytes, sign_recovery = private_key_object.ecdsa_recoverable_serialize(
-        recoverable_sign
-    )
-    return sign_bytes + sign_recovery.to_bytes(1, "big")
+    private_key_object = PrivateKey(private_key)
+    return private_key_object.sign_recoverable(message, hasher=None)
 
 
 def create_key_pair(
@@ -48,14 +42,14 @@ def create_key_pair(
     :param compressed: The format of a public key to create
     :return: (private_key, uncompressed public_key)
     """
-    private_key_object = PrivateKey(private_key, raw=True, ctx=_ctx)
+    private_key_object = PrivateKey(private_key)
 
-    private_key: bytes = private_key_object.private_key
-    public_key: bytes = private_key_object.pubkey.serialize(compressed)
+    private_key: bytes = private_key_object.secret
+    public_key: bytes = private_key_object.public_key.format(compressed)
 
     return private_key, public_key
 
 
 def extract_public_key(private_key: bytes, compressed: bool = False) -> bytes:
-    private_key_object = PrivateKey(private_key, raw=True, ctx=_ctx)
-    return private_key_object.pubkey.serialize(compressed=compressed)
+    private_key_object = PrivateKey(private_key)
+    return private_key_object.public_key.format(compressed)

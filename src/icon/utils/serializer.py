@@ -15,7 +15,7 @@
 
 from copy import deepcopy
 from hashlib import sha3_256
-from typing import Optional
+from typing import Optional, Dict
 
 translator = str.maketrans(
     {"\\": "\\\\", "{": "\\{", "}": "\\}", "[": "\\[", "]": "\\]", ".": "\\."}
@@ -58,7 +58,7 @@ def __make_params_serialized(json_data: dict) -> str:
     return ".".join(_encode_dict(json_data))
 
 
-def generate_message(params: dict) -> str:
+def generate_message(params: Dict[str, str]) -> str:
     """
     Serialized params of an original JSON request starting with `icx_sendTransaction`
     to generate a message hash for a signature.
