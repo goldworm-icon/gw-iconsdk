@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from typing import Dict
+
 import icon
 import pytest
-from icon.data.address import Address
+from icon.data.address import Address, AddressPrefix
 from icon.data.transaction import Transaction
 from icon.data.transaction_result import TransactionResult
 from icon.utils.convert_type import hex_to_bytes
@@ -65,3 +67,9 @@ class TestClient(object):
         tx_result: "TransactionResult" = client.get_transaction_result(tx_hash)
         assert tx_result.status == TransactionResult.Status.SUCCESS
         assert tx_result.tx_hash == tx_hash
+
+    def test_get_score_api(self, client):
+        ret: Dict[str, str] = client.get_score_api(
+            Address.from_int(AddressPrefix.CONTRACT, 0)
+        )
+        assert isinstance(ret, dict)
