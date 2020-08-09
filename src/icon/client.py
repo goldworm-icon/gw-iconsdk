@@ -14,12 +14,13 @@
 # limitations under the License.
 
 from base64 import standard_b64encode
-from typing import Dict, Any
+from typing import Dict, Any, Union
 
 from .builder.key import Key
 from .builder.method import Method
 from .data.address import Address
 from .data.block import Block
+from .data.exception import JSONRPCException
 from .data.rpc_request import RpcRequest
 from .data.rpc_response import RpcResponse
 from .data.transaction import Transaction
@@ -99,7 +100,7 @@ class Client(object):
         signature: bytes = sign_recoverable(message_hash, private_key)
         return standard_b64encode(signature).decode("utf-8")
 
-    def call(self, params: Dict[str, str]) -> Dict[str, str]:
+    def call(self, params: Dict[str, str]) -> Union[str, Dict[str, str]]:
         response = self._send(Method.CALL, params)
         return response.result
 
@@ -109,7 +110,12 @@ class Client(object):
 
     def _send(self, method: str, params: Dict[str, str] = None) -> RpcResponse:
         request = RpcRequest(method, params)
-        return self._provider.send(request)
+        response = self._provider.send(request)
+
+        if response.error:
+            raise JSONRPCException(f"{response.error}")
+
+        return response
 
     def send(self, request: RpcRequest) -> RpcResponse:
         return self._provider.send(request)

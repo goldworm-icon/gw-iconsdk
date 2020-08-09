@@ -4,7 +4,6 @@ __all__ = "CallBuilder"
 
 from typing import Dict, Any, Optional
 
-from . import PROTO_VERSION
 from .generic_builder import GenericBuilder
 from .key import Key
 from ..data.address import Address
@@ -15,9 +14,7 @@ class CallBuilder(GenericBuilder):
     def __init__(self, method: str):
         super().__init__()
 
-        self.add(Key.VERSION, PROTO_VERSION)
         self.add(Key.DATA_TYPE, "call")
-
         self._data: Dict[str, Any] = {"method": method}
 
     def version(self, version: int) -> "CallBuilder":

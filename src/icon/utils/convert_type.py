@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+__all__ = (
+    "str_to_int",
+    "bytes_to_hex",
+    "hex_to_bytes",
+    "str_to_int",
+)
+
 from typing import Optional
 
 from ..data.address import Address
@@ -22,8 +29,7 @@ def str_to_int(value: str) -> int:
     if isinstance(value, int):
         return value
 
-    base = 16 if is_hex(value) else 10
-    return int(value, base)
+    return int(value, base=0)
 
 
 def object_to_str(value) -> str:
