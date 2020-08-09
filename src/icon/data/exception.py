@@ -16,6 +16,7 @@ class SDKException(Exception):
         ZIP_MEMORY_ERROR = 6
         URL_ERROR = 7
         CALL_ERROR = 8
+        ARG_ERROR = 9
 
         def __str__(self) -> str:
             return str(self.name).capitalize().replace("_", " ")
@@ -62,6 +63,11 @@ class DataTypeException(SDKException):
 
     def __init__(self, message: Optional[str]):
         super().__init__(SDKException.Code.DATA_TYPE_ERROR, message)
+
+
+class ArgumentException(SDKException):
+    def __init__(self, message: Optional[str]):
+        super().__init__(SDKException.Code.ARG_ERROR, message)
 
 
 class JSONRPCException(SDKException):

@@ -81,7 +81,9 @@ class Client(object):
         response = self._send(Method.GET_SCORE_API, params)
         return response.result
 
-    def send_transaction(self, params: Dict[str, str], private_key: bytes = None) -> bytes:
+    def send_transaction(
+        self, params: Dict[str, str], private_key: bytes = None
+    ) -> bytes:
         if not isinstance(params, dict):
             ValueError(f"Invalid params: params={params}")
 
@@ -107,4 +109,7 @@ class Client(object):
 
     def _send(self, method: str, params: Dict[str, str] = None) -> RpcResponse:
         request = RpcRequest(method, params)
+        return self._provider.send(request)
+
+    def send(self, request: RpcRequest) -> RpcResponse:
         return self._provider.send(request)

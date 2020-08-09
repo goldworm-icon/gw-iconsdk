@@ -13,11 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = (
-    "TransactionBuilder",
-    "CallTransactionBuilder",
-    "DeployTransactionBuilder"
-)
+__all__ = ("TransactionBuilder", "CallTransactionBuilder", "DeployTransactionBuilder")
 
 from base64 import standard_b64encode
 from time import time_ns
@@ -83,6 +79,11 @@ class TransactionBuilder(GenericBuilder):
     def nid(self, nid: int) -> "TransactionBuilder":
         self.add(Key.NID, nid)
         self._set_flag(KeyFlag.NID, True)
+        return self
+
+    def nonce(self, nonce: int) -> "TransactionBuilder":
+        self.add(Key.NONCE, nonce)
+        self._set_flag(KeyFlag.NONCE, True)
         return self
 
     def signature(self, signature: bytes) -> "TransactionBuilder":
