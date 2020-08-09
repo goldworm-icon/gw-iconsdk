@@ -20,7 +20,7 @@ from typing import List, Dict, Optional
 
 from .address import Address
 from .event_log import EventLog
-from ..utils.convert_type import hex_to_bytes, str_to_int
+from ..utils.convert_type import bytes_to_hex, hex_to_bytes, str_to_int
 
 
 class TransactionResult(object):
@@ -84,7 +84,25 @@ class TransactionResult(object):
         self._score_address: Optional["Address"] = score_address
         self._fee = step_price * step_used
         self._logs_bloom: Optional[bytes] = logs_bloom
-        self._event_logs: List["EventLog"] = [] if event_logs is None else event_logs
+        self._event_logs: List[EventLog] = [] if event_logs is None else event_logs
+
+    def __str__(self):
+        items = (
+            f"status: {self._status}",
+            f"failure: {self._failure}",
+            f"blockHeight: {self._block_height}",
+            f"blockHash: {bytes_to_hex(self._block_hash)}",
+            f"txHash: {bytes_to_hex(self._tx_hash)}",
+            f"txIndex: {self._tx_index}",
+            f"to: {self._to}",
+            f"scoreAddress: {self._score_address}",
+            f"stepPrice: {self._step_price}",
+            f"stepUsed: {self._step_used}",
+            f"fee: {self._fee}",
+            f"eventLogs: {[str(event_log) for event_log in self._event_logs]}",
+        )
+
+        return "\n".join(items)
 
     @property
     def status(self) -> Status:

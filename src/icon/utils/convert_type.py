@@ -18,6 +18,8 @@ __all__ = (
     "bytes_to_hex",
     "hex_to_bytes",
     "str_to_int",
+    "str_to_object",
+    "object_to_str",
 )
 
 from typing import Optional
