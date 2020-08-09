@@ -18,4 +18,10 @@ from .builder.method import Method
 from .builder.query_builder import CallBuilder
 from .builder.transaction_builder import *
 from .client import Client
+from .data.address import *
+from .data.block import Block
+from .data.event_log import EventLog
+from .data.transaction_result import TransactionResult
 from .provider.http_provider import HTTPProvider
+from .wallet.wallet import KeyWallet
+from .utils.convert_type import *

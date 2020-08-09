@@ -17,6 +17,8 @@
 """functions and classes to handle address
 """
 
+__all__ = ("AddressPrefix", "Address")
+
 import hashlib
 from enum import IntEnum
 

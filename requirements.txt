@@ -1,4 +1,5 @@
-pytest
-requests
 coincurve
+eth_keyfile
 multipledispatch
+requests
+

@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+__all__ = "TransactionResult"
+
 from enum import IntEnum
 from typing import List, Dict, Optional
 
@@ -34,6 +36,9 @@ class TransactionResult(object):
         def __init__(self, code: int, message: str):
             self._code = code
             self._message = message
+
+        def __str__(self) -> str:
+            return f"Failure(code={self._code}, message={self._message})"
 
         @property
         def code(self) -> int:

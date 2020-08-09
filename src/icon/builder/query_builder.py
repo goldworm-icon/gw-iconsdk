@@ -2,7 +2,7 @@
 
 __all__ = "CallBuilder"
 
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from . import PROTO_VERSION
 from .generic_builder import GenericBuilder
@@ -24,15 +24,22 @@ class CallBuilder(GenericBuilder):
         self.add(Key.VERSION, version)
         return self
 
-    def from_(self, from_: Address) -> "CallBuilder":
-        self.add(Key.FROM, from_)
+    def from_(self, address: Address) -> "CallBuilder":
+        self.add(Key.FROM, address)
+        return self
+
+    def to(self, address: Address) -> "CallBuilder":
+        self.add(Key.TO, address)
         return self
 
     def method(self, method: str) -> "CallBuilder":
         self._data["method"] = method
         return self
 
-    def params(self, params: Dict[str, Any]) -> "CallBuilder":
+    def params(self, params: Optional[Dict[str, Any]]) -> "CallBuilder":
+        if params is None:
+            return self
+
         if not isinstance(params, dict):
             raise DataTypeException(f"params must be dict type: {params}")
 
