@@ -18,10 +18,11 @@ from .builder.method import Method
 from .builder.query_builder import CallBuilder
 from .builder.transaction_builder import *
 from .client import Client
-from .data.address import *
+from .data.address import Address, AddressPrefix
 from .data.block import Block
 from .data.event_log import EventLog
 from .data.exception import SDKException
+from .data.transaction import Transaction
 from .data.transaction_result import TransactionResult
 from .provider.http_provider import HTTPProvider
 from .utils.convert_type import *

@@ -6,8 +6,8 @@ from enum import IntEnum, auto
 from typing import Optional, Dict, Union, Any
 
 from .address import Address
-from ..utils.convert_type import str_to_int, hex_to_bytes, bytes_to_hex
 from .exception import JSONRPCException
+from ..utils.convert_type import str_to_int, hex_to_bytes, bytes_to_hex
 
 
 class DataType(IntEnum):
@@ -61,20 +61,24 @@ class Transaction(object):
         self._data = data
 
     def __str__(self):
-        return (
-            f"version={self._version}\n"
-            f"nid={self._nid}\n"
-            f"block_hash={bytes_to_hex(self._block_hash)}\n"
-            f"block_height={self._block_height}\n"
-            f"tx_hash={bytes_to_hex(self._tx_hash)}\n"
-            f"tx_index={self._tx_index}\n"
-            f"from={self._from}\n"
-            f"to={self._to}\n"
-            f"value={self._value}\n"
-            f"timestamp={self._timestamp}\n"
-            f"signature={bytes_to_hex(self._signature)}\n"
-            f"data_type={self._data_type}"
+        items = (
+            f"version={self._version}",
+            f"nid={self._nid}",
+            f"block_hash={bytes_to_hex(self._block_hash)}",
+            f"block_height={self._block_height}",
+            f"tx_hash={bytes_to_hex(self._tx_hash)}",
+            f"tx_index={self._tx_index}",
+            f"from={self._from}",
+            f"to={self._to}",
+            f"value={self._value}",
+            f"step_limit={self._step_limit}",
+            f"timestamp={self._timestamp}",
+            f"signature={bytes_to_hex(self._signature)}",
+            f"data_type={self._data_type}",
+            f"data={self._data}",
         )
+
+        return "\n".join(items)
 
     @property
     def version(self) -> int:
@@ -207,5 +211,5 @@ class Transaction(object):
         raise JSONRPCException("No timestamp in transaction")
 
     @staticmethod
-    def _get_data(tx_dict: Dict) -> Any:
-        return None
+    def _get_data(tx_dict: Dict[str, str]) -> Any:
+        return tx_dict.get("data")

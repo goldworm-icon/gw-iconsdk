@@ -46,7 +46,7 @@ class Client(object):
         return self._defaults
 
     def get_block_by_hash(self, block_hash: bytes) -> Block:
-        params = {"txHash": bytes_to_hex(block_hash)}
+        params = {"hash": bytes_to_hex(block_hash)}
         response = self._send(Method.GET_BLOCK_BY_HASH, params)
         return Block.from_dict(response.result)
 
@@ -54,8 +54,12 @@ class Client(object):
         if not (isinstance(block_height, int) and block_height >= 0):
             raise ValueError(f"Invalid params: {block_height}")
 
-        params = {"txHash": hex(block_height)}
-        response = self._send(Method.GET_BLOCK_BY_HASH, params)
+        params = {"height": hex(block_height)}
+        response = self._send(Method.GET_BLOCK_BY_HEIGHT, params)
+        return Block.from_dict(response.result)
+
+    def get_last_block(self) -> Block:
+        response = self._send(Method.GET_LAST_BLOCK)
         return Block.from_dict(response.result)
 
     def get_transaction(self, tx_hash: bytes) -> Transaction:

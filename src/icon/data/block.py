@@ -6,7 +6,7 @@ from typing import Dict, List, Union, Optional
 from .address import Address
 from .transaction import Transaction
 from ..builder.key import Key
-from ..utils.convert_type import hex_to_bytes, str_to_int
+from ..utils.convert_type import hex_to_bytes, str_to_int, bytes_to_hex
 
 
 def _get_timestamp(block_dict: dict) -> int:
@@ -65,10 +65,20 @@ class Block(object):
         self._transactions: List[Transaction] = []
 
     def __str__(self) -> str:
-        pass
+        items = (
+            f"version={self._version}",
+            f"height={self._height}",
+            f"hash={bytes_to_hex(self._hash)}",
+            f"prev_hash={bytes_to_hex(self._prev_hash)}",
+            f"timestamp={self._timestamp}",
+            f"merkle_tree_root_hash={bytes_to_hex(self._merkle_tree_root_hash)}",
+            f"peer_id={self._peer_id}",
+            f"next_leader={self.next_leader}",
+            f"signature={bytes_to_hex(self._signature)}",
+            f"transactions={self._transactions}",
+        )
 
-    def __repr__(self) -> str:
-        pass
+        return "\n".join(items)
 
     @property
     def version(self) -> str:
