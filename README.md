@@ -1,45 +1,81 @@
 # gw-iconsdk
 
-Source repository: https://github.com/goldworm-icon/gw-iconsdk
+* Repository: https://github.com/goldworm-icon/gw-iconsdk
 
-## Prerequisite
+# Prerequisite
 
 * [coincurve](https://pypi.org/project/coincurve/)
+* [eth_keyfile](https://github.com/ethereum/eth-keyfile)
 * [multipledispatch](https://pypi.org/project/multipledispatch/)
 * [requests](https://pypi.org/project/requests/)
 
-## Installation
+# Installation
 
 ```
 $ pip install gw-iconsdk
 ```
 
-## How to use API
+# How to use API
+
+## send_transaction
 
 ```python
+from typing import Dict
+
 import icon
 
 provider = icon.HttpProvider()
 client = icon.Client(provider)
+wallet = icon.KeyWallet()
+to: icon.Address = icon.Address.from_string("hx0123456789012345678901234567890123456789")
 
 try:
-    builder = icon.TransactionBuilder()
-    Transaction
+    params: Dict[str, str] = icon.TransactionBuilder() \
+        .from_(wallet.address) \
+        .to(to) \
+        .value(10 * 10 ** 18) \
+        .step_limit(100_000) \
+        .nonce(0) \
+        .build()
 
-    request = builder.build()
-    response = client.icx.call(request)
-    print(response)
-except icon.IconServiceBaseException as e:
+    tx_hash: bytes = client.send_transaction(params, wallet.private_key)
+except icon.SDKException as e:
     print(e)
 ```
 
-### send_transaction
-
 ### estimate_step
 
-### get_block
+* Estimate the quantity of steps required to process a transaction
 
-* Query block information with given parameters
+```python
+from typing import Dict
+
+import icon
+
+provider = icon.HttpProvider("https://localhost:9000")
+client = icon.Client(provider)
+wallet = icon.KeyWallet()
+to = icon.Address.from_string("hx0123456789012345678901234567890123456789")
+
+try:
+    params: Dict[str, str] = icon.TransactionBuilder() \
+        .from_(wallet.address) \
+        .to(to) \
+        .value(10 * 10 ** 18) \
+        .step_limit(100_000) \
+        .nonce(0) \
+        .build()
+
+    estimated_step: int = client.estimate_step(params)
+except icon.SDKException as e:
+    print(e)
+```
+
+### get_block_by_hash
+
+* Query block information with given block hash
+
+### get_block_by_height
 
 ### get_transaction
 
@@ -49,11 +85,12 @@ except icon.IconServiceBaseException as e:
 
 ### get_balance
 
-### get_scoreApi
+### get_score_api
 
 ### call
 
 ## References
 
+* [ICON JSON-RPC API v3 Specification](https://www.icondev.io/docs/icon-json-rpc-v3)
+* [ICON SDK for Python](https://github.com/icon-project/icon-sdk-python)
 * [Web3.py](https://web3py.readthedocs.io/en/stable/) 
-* 
