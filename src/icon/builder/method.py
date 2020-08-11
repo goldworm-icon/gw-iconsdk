@@ -7,6 +7,7 @@ class Method(object):
 
     CALL = "icx_call"
 
+    GET_BLOCK = "icx_getBlock"
     GET_BLOCK_BY_HASH = "icx_getBlockByHash"
     GET_BLOCK_BY_HEIGHT = "icx_getBlockByHeight"
     GET_LAST_BLOCK = "icx_getLastBlock"
@@ -20,3 +21,5 @@ class Method(object):
 
     ESTIMATE_STEP = "debug_estimateStep"
     SEND_TRANSACTION = "icx_sendTransaction"
+
+    GET_STATUS = "ise_getStatus"

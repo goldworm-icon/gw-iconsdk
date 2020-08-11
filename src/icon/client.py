@@ -20,7 +20,7 @@ from .builder.key import Key
 from .builder.method import Method
 from .data.address import Address
 from .data.block import Block
-from .data.exception import JSONRPCException
+from .data.exception import JSONRPCException, ArgumentException
 from .data.rpc_request import RpcRequest
 from .data.rpc_response import RpcResponse
 from .data.transaction import Transaction
@@ -86,6 +86,19 @@ class Client(object):
         response = self._send(Method.GET_SCORE_API, params)
         return response.result
 
+    def get_block(self, value: Union[bytes, int, None] = None) -> Dict[str, str]:
+        if isinstance(value, bytes):
+            params = {"hash": bytes_to_hex(value)}
+        elif isinstance(value, int):
+            params = {"hash": hex(value)}
+        elif value is None:
+            params = None
+        else:
+            raise ArgumentException(f"Invalid argument: {value}")
+
+        response = self._send(Method.GET_BLOCK, params)
+        return response.result
+
     def send_transaction(
         self, params: Dict[str, str], private_key: bytes = None
     ) -> bytes:
@@ -111,6 +124,11 @@ class Client(object):
     def estimate_step(self, params: Dict[str, str]) -> int:
         response = self._send(Method.ESTIMATE_STEP, params)
         return str_to_int(response.result)
+
+    def get_status(self) -> Dict[str, str]:
+        params = {"filter": ["lastBlock"]}
+        response = self._send(Method.GET_STATUS, params)
+        return response.result
 
     def _send(self, method: str, params: Dict[str, str] = None) -> RpcResponse:
         request = RpcRequest(method, params)
