@@ -15,6 +15,7 @@
 
 import requests
 
+from ..builder.method import Method
 from ..data.rpc_request import RpcRequest
 from ..data.rpc_response import RpcResponse
 from ..provider.provider import Provider
@@ -43,7 +44,8 @@ class HTTPProvider(Provider):
         return self._version
 
     def send(self, request: RpcRequest, **kwargs) -> RpcResponse:
-        url = self._url
+        url = self._get_url(request.method)
+        print(url)
 
         response: requests.Response = requests.post(url, json=request.to_dict())
 
@@ -51,6 +53,9 @@ class HTTPProvider(Provider):
             self._dispatch_hook("response", kwargs["hooks"], response)
 
         return RpcResponse(response.json())
+
+    def _get_url(self, method: str) -> str:
+        return self._debug_url if method == Method.ESTIMATE_STEP else self._url
 
     @staticmethod
     def _dispatch_hook(key: str, hooks, hook_data: requests.Response):

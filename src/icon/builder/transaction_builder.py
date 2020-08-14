@@ -13,20 +13,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ("TransactionBuilder", "CallTransactionBuilder", "DeployTransactionBuilder")
+__all__ = (
+    "Transaction",
+    "TransactionBuilder",
+    "CallTransactionBuilder",
+    "DeployTransactionBuilder",
+)
 
 from base64 import standard_b64encode
+from collections import OrderedDict
 from time import time_ns
 from typing import Union, Dict, Any, Optional
 
-from . import PROTO_VERSION
 from .generic_builder import GenericBuilder
 from .key import Key, KeyFlag
 from ..data.address import Address
 from ..data.exception import CallException, DataTypeException
 from ..utils.crypto import sign_recoverable
 from ..utils.in_memory_zip import gen_deploy_data_content
-from ..utils.serializer import generate_message, generate_message_hash
+from ..utils.serializer import generate_message_hash
+
+PROTO_VERSION = 3
+
+
+class Transaction(OrderedDict):
+    def __init__(self, params: Dict[str, str]):
+        super().__init__(params)
+        self._hash: bytes = generate_message_hash(params)
+
+    @property
+    def tx_hash(self) -> bytes:
+        return self._hash
+
+    def sign(self, private_key: bytes) -> bytes:
+        sign: bytes = sign_recoverable(self._hash, private_key)
+        self[Key.SIGNATURE] = standard_b64encode(sign).decode("utf-8")
+        return sign
 
 
 class TransactionBuilder(GenericBuilder):
@@ -101,83 +123,52 @@ class TransactionBuilder(GenericBuilder):
         self._set_flag(KeyFlag.DATA, True)
         return self
 
-    def generate_message(self) -> str:
-        return generate_message(self._params)
-
-    def generate_message_hash(self) -> bytes:
-        return generate_message_hash(self._params)
-
-    def build_and_sign(self, private_key: bytes) -> Dict[str, str]:
+    def build(self) -> Transaction:
         if Key.TIMESTAMP not in self._params:
             time_us = time_ns() * 1000
             self.timestamp(time_us)
 
         params: Dict[str, str] = super().build()
-
-        if Key.SIGNATURE not in params:
-            params[Key.SIGNATURE] = self._sign(private_key, params)
-
-        return params
-
-    @classmethod
-    def _sign(cls, private_key: bytes, params: Dict[str, str]) -> Optional[str]:
-        message_hash: bytes = generate_message_hash(params)
-        sign: bytes = sign_recoverable(message_hash, private_key)
-        return standard_b64encode(sign).decode("utf-8")
+        return Transaction(params)
 
 
 class CallTransactionBuilder(TransactionBuilder):
-    def __init__(self, method: str):
+    def __init__(self):
         super().__init__()
-        super().data_type("call")
-        self._data: Dict[str, Any] = {"method": method}
 
     def data(self, data: Union[Dict[str, Any], str]):
         raise CallException(f"data() is not allowed in {self.__class__.__name__}")
 
-    def method(self, method: str) -> "CallTransactionBuilder":
-        self._data["method"] = method
+    def call_data(self, method: str, params: Optional[Dict[str, str]]) -> "CallTransactionBuilder":
+        data = {"method": method}
+        if isinstance(params, dict):
+            data["params"] = params
+
+        super().data_type("call")
+        super().data(data)
         return self
-
-    def params(self, params: Dict[str, Any]) -> "CallTransactionBuilder":
-        if not isinstance(params, dict):
-            raise DataTypeException(f"params must be dict type: {params}")
-
-        self._data["params"] = params
-        return self
-
-    def build_and_sign(self, private_key: bytes) -> Dict[str, str]:
-        super().data(self._data)
-        return super().build_and_sign(private_key)
 
 
 class DeployTransactionBuilder(TransactionBuilder):
     def __init__(self):
         super().__init__()
-        super().data_type("deploy")
-        self._data: Dict[str, Any] = {}
 
     def data(self, data: Union[Dict[str, Any], str]):
         raise CallException(f"data() is not allowed in {self.__class__.__name__}")
 
-    def content_from_bytes(self, data: bytes) -> "DeployTransactionBuilder":
-        self._data["content"] = data
-        self._data["contentType"] = "application/zip"
-        return self
+    def deploy_data_from_bytes(self, data: bytes, params: Optional[Dict[str, Any]]) -> "DeployTransactionBuilder":
+        deploy_data = {"content": data, "contentType": "application/zip"}
 
-    def content_from_path(self, path: str) -> "DeployTransactionBuilder":
-        data: bytes = gen_deploy_data_content(path)
-        return self.content_from_bytes(data)
-
-    def params(self, params: Optional[Dict[str, Any]]) -> "DeployTransactionBuilder":
         if params:
             if not isinstance(params, dict):
                 raise DataTypeException(f"params must be dict type: {params}")
 
-            self._data["params"] = params
+            deploy_data["params"] = params
 
+        super().data_type("deploy")
+        super().data(deploy_data)
         return self
 
-    def build_and_sign(self, private_key: bytes) -> Dict[str, str]:
-        super().data(self._data)
-        return super().build()
+    def deploy_data_from_path(self, path: str, params: Optional[Dict[str, Any]]) -> "DeployTransactionBuilder":
+        data: bytes = gen_deploy_data_content(path)
+        return self.deploy_data_from_bytes(data, params)

@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-PROTO_VERSION = 3
+from .transaction_builder import Transaction

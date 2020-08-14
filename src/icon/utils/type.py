@@ -19,6 +19,8 @@ __all__ = (
     "hex_to_bytes",
     "str_to_int",
     "str_to_base_object_by_typename",
+    "to_str_list",
+    "to_str_dict",
     "base_object_to_str",
     "str_to_object_by_type",
     "str_to_base_object_by_type",
@@ -72,7 +74,7 @@ def to_str_list(o: list) -> list:
     return ret
 
 
-def to_str_dict(o: dict) -> dict:
+def to_str_dict(o: Dict[str, Any]) -> Dict[str, str]:
     ret = {}
 
     for key, value in o.items():

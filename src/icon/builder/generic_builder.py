@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
 from typing import Dict, Any
 
 from ..utils.type import to_str_dict
@@ -28,4 +27,4 @@ class GenericBuilder(object):
         return self
 
     def build(self) -> Dict[str, str]:
-        return to_str_dict(copy.deepcopy(self._params))
+        return to_str_dict(self._params)
