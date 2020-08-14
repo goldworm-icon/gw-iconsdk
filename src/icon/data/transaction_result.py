@@ -20,7 +20,7 @@ from typing import List, Dict, Optional
 
 from .address import Address
 from .event_log import EventLog
-from ..utils.convert_type import bytes_to_hex, hex_to_bytes, str_to_int
+from ..utils.type import bytes_to_hex, hex_to_bytes, str_to_int
 
 
 class TransactionResult(object):

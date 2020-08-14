@@ -16,7 +16,7 @@
 from typing import List, Dict, Tuple, Union
 
 from .address import Address
-from ..utils.convert_type import str_to_object, object_to_str
+from ..utils.type import str_to_base_object_by_typename, base_object_to_str
 
 
 class EventLog(object):
@@ -28,8 +28,8 @@ class EventLog(object):
     def __str__(self):
         items = (
             f"scoreAddress={self._score_address}",
-            f"indexed={[object_to_str(item) for item in self._indexed]}",
-            f"data={[object_to_str(item) for item in self._data]}",
+            f"indexed={[base_object_to_str(item) for item in self._indexed]}",
+            f"data={[base_object_to_str(item) for item in self._data]}",
         )
 
         return ", ".join(items)
@@ -63,12 +63,12 @@ class EventLog(object):
 
         # Convert indexed data type
         for i in range(1, len(indexed)):
-            indexed[i] = str_to_object(types[index], indexed[i])
+            indexed[i] = str_to_base_object_by_typename(types[index], indexed[i])
             index += 1
 
         # Convert not-indexed data type
         for i in range(len(data)):
-            data[i] = str_to_object(types[index], data[i])
+            data[i] = str_to_base_object_by_typename(types[index], data[i])
             index += 1
 
         return EventLog(score_address, indexed, data)
@@ -80,6 +80,6 @@ class EventLog(object):
 
         index = signature.index("(")
         name = signature[:index]
-        params = signature[index + 1: -1].split(",")
+        params = signature[index + 1 : -1].split(",")
 
         return name, params

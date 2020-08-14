@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from icon.data.transaction_result import TransactionResult
-from icon.utils.convert_type import bytes_to_hex
+from icon.utils.type import bytes_to_hex
 
 
 class TestTransactionResult(object):

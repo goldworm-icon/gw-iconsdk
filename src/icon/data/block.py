@@ -6,7 +6,7 @@ from typing import Dict, List, Union, Optional
 from .address import Address
 from .transaction import Transaction
 from ..builder.key import Key
-from ..utils.convert_type import hex_to_bytes, str_to_int, bytes_to_hex
+from ..utils.type import hex_to_bytes, str_to_int, bytes_to_hex
 
 
 def _get_timestamp(block_dict: dict) -> int:
@@ -51,7 +51,7 @@ class Block(object):
         merkle_tree_root_hash: bytes,
         peer_id: Address,
         next_leader: Optional[Address],
-        signature: bytes
+        signature: bytes,
     ):
         self._version: str = version
         self._height: int = height

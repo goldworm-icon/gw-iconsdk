@@ -25,5 +25,5 @@ from .data.exception import SDKException
 from .data.transaction import Transaction
 from .data.transaction_result import TransactionResult
 from .provider.http_provider import HTTPProvider
-from .utils.convert_type import *
+from .utils.type import *
 from .wallet.wallet import KeyWallet

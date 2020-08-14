@@ -169,11 +169,13 @@ class DeployTransactionBuilder(TransactionBuilder):
         data: bytes = gen_deploy_data_content(path)
         return self.content_from_bytes(data)
 
-    def params(self, params: Dict[str, Any]) -> "DeployTransactionBuilder":
-        if not isinstance(params, dict):
-            raise DataTypeException(f"params must be dict type: {params}")
+    def params(self, params: Optional[Dict[str, Any]]) -> "DeployTransactionBuilder":
+        if params:
+            if not isinstance(params, dict):
+                raise DataTypeException(f"params must be dict type: {params}")
 
-        self._data["params"] = params
+            self._data["params"] = params
+
         return self
 
     def build_and_sign(self, private_key: bytes) -> Dict[str, str]:

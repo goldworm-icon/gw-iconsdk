@@ -3,7 +3,7 @@
 import pytest
 
 from icon.data.address import Address
-from icon.utils.convert_type import to_str_dict, bytes_to_hex
+from icon.utils.type import to_str_dict, bytes_to_hex
 
 
 class TestConvertType(object):

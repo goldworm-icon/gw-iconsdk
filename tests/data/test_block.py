@@ -4,7 +4,7 @@ import base64
 
 from icon.data.address import Address
 from icon.data.block import Block
-from icon.utils.convert_type import hex_to_bytes, bytes_to_hex
+from icon.utils.type import hex_to_bytes, bytes_to_hex
 
 
 class TestBlock(object):

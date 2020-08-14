@@ -18,11 +18,14 @@ __all__ = (
     "bytes_to_hex",
     "hex_to_bytes",
     "str_to_int",
-    "str_to_object",
-    "object_to_str",
+    "str_to_base_object_by_typename",
+    "base_object_to_str",
+    "str_to_object_by_type",
+    "str_to_base_object_by_type",
+    "is_base_object_type",
 )
 
-from typing import Optional
+from typing import Optional, Any, Dict, List, Union
 
 from ..data.address import Address
 
@@ -34,7 +37,7 @@ def str_to_int(value: str) -> int:
     return int(value, base=0)
 
 
-def object_to_str(value) -> str:
+def base_object_to_str(value) -> str:
     if isinstance(value, Address):
         return str(value)
     elif isinstance(value, int):
@@ -62,7 +65,7 @@ def to_str_list(o: list) -> list:
         elif isinstance(value, list):
             value = to_str_list(value)
         else:
-            value = object_to_str(value)
+            value = base_object_to_str(value)
 
         ret.append(value)
 
@@ -78,14 +81,14 @@ def to_str_dict(o: dict) -> dict:
         elif isinstance(value, list):
             value = to_str_list(value)
         else:
-            value = object_to_str(value)
+            value = base_object_to_str(value)
 
         ret[key] = value
 
     return ret
 
 
-def str_to_object(object_type: str, value: str) -> object:
+def str_to_base_object_by_typename(object_type: str, value: str) -> object:
     if object_type == "Address":
         return Address.from_string(value)
     if object_type == "int":
@@ -116,3 +119,41 @@ def hex_to_bytes(value: Optional[str]) -> Optional[bytes]:
 
 def is_hex(value: str) -> bool:
     return value.startswith("0x") or value.startswith("-0x")
+
+
+def is_base_object_type(object_type: type) -> bool:
+    return object_type in (bool, bytes, int, str, Address, type(None))
+
+
+def str_to_base_object_by_type(object_type: type, value: str) -> Any:
+    if object_type is bool:
+        return bool(str_to_int(value))
+    if object_type is bytes:
+        return hex_to_bytes(value)
+    if object_type is int:
+        return str_to_int(value)
+    if object_type is str:
+        return value
+    if object_type is Address:
+        return Address.from_string(value)
+
+    raise TypeError(f"Unknown type: {object_type}")
+
+
+def str_to_object_by_type(
+    object_type: Union[type, List[type], Dict[str, type]],
+    value: Union[str, List[str], Dict[str, str], None],
+) -> Any:
+    if value is None:
+        return None
+
+    if isinstance(value, str):
+        return str_to_base_object_by_type(object_type, value)
+    if isinstance(value, list):
+        return [
+            str_to_object_by_type(object_type[0], item) for item in value
+        ]
+    if isinstance(value, dict):
+        return {k: str_to_object_by_type(object_type[k], value[k]) for k in value}
+
+    raise TypeError(f"Invalid type: {type(value)}, {value}")

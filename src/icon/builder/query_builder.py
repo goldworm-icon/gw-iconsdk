@@ -17,10 +17,6 @@ class CallBuilder(GenericBuilder):
         self.add(Key.DATA_TYPE, "call")
         self._data: Dict[str, Any] = {"method": method}
 
-    def version(self, version: int) -> "CallBuilder":
-        self.add(Key.VERSION, version)
-        return self
-
     def from_(self, address: Address) -> "CallBuilder":
         self.add(Key.FROM, address)
         return self

@@ -22,7 +22,7 @@ import json
 
 from ..data.address import Address
 from .object import Object
-from ..utils.convert_type import to_str_dict
+from ..utils.type import to_str_dict
 
 _VALUE_TYPES = (bool, int, bytes, str, Address, MutableMapping)
 

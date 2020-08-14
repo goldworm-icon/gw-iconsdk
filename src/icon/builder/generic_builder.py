@@ -16,7 +16,7 @@
 import copy
 from typing import Dict, Any
 
-from ..utils.convert_type import to_str_dict
+from ..utils.type import to_str_dict
 
 
 class GenericBuilder(object):
