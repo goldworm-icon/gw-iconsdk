@@ -1,19 +1,26 @@
 # -*- coding: utf-8 -*-
 
-from typing import Dict
+from base64 import standard_b64decode
 
+from icon.builder import Transaction
+from icon.builder.key import Key
 from icon.builder.transaction_builder import TransactionBuilder
 from icon.wallet.wallet import KeyWallet
 
 
 def test_transaction_builder(wallet: KeyWallet, address):
-    builder = TransactionBuilder()
-    builder.version(3)
-    builder.from_(wallet.address)
-    builder.to(address)
-    builder.value(100)
-    builder.nid(1)
-    builder.step_limit(1_000_000)
+    tx: Transaction = (
+        TransactionBuilder()
+        .from_(wallet.address)
+        .to(address)
+        .value(100)
+        .nid(1)
+        .step_limit(1_000_000)
+        .build()
+    )
 
-    tx: Dict[str, str] = builder.build_and_sign(wallet.private_key)
-    print(tx)
+    signature: bytes = tx.sign(wallet.private_key)
+    assert wallet.verify_signature(signature, tx.tx_hash)
+
+    signature_in_tx = standard_b64decode(tx[Key.SIGNATURE])
+    assert signature_in_tx == signature

@@ -22,8 +22,6 @@ __all__ = ("AddressPrefix", "Address")
 import hashlib
 from enum import IntEnum
 
-from .object import Object
-
 _EOA_PREFIX = "hx"
 _CONTRACT_PREFIX = "cx"
 
@@ -64,7 +62,7 @@ class AddressPrefix(IntEnum):
         raise ValueError(f"Invalid prefix: {prefix}")
 
 
-class Address(Object):
+class Address(object):
     """Address class
     """
 

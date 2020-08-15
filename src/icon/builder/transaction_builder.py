@@ -29,7 +29,7 @@ from .generic_builder import GenericBuilder
 from .key import Key, KeyFlag
 from ..data.address import Address
 from ..data.exception import CallException, DataTypeException
-from ..utils.crypto import sign_recoverable
+from ..utils.crypto import sign
 from ..utils.in_memory_zip import gen_deploy_data_content
 from ..utils.serializer import generate_message_hash
 
@@ -56,9 +56,9 @@ class Transaction(Mapping):
         return self._hash
 
     def sign(self, private_key: bytes) -> bytes:
-        sign: bytes = sign_recoverable(self._hash, private_key)
-        self._params[Key.SIGNATURE] = standard_b64encode(sign).decode("utf-8")
-        return sign
+        signature: bytes = sign(self._hash, private_key, recoverable=True)
+        self._params[Key.SIGNATURE] = standard_b64encode(signature).decode("utf-8")
+        return signature
 
     def to_dict(self) -> Dict[str, str]:
         return self._params
