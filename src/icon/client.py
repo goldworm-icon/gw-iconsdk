@@ -96,7 +96,9 @@ class Client(object):
         response = self._send(Method.GET_BLOCK, params)
         return response.result
 
-    def send_transaction(self, tx: Transaction, estimate: bool = False) -> Union[int, bytes]:
+    def send_transaction(
+        self, tx: Transaction, estimate: bool = False
+    ) -> Union[int, bytes]:
         if not isinstance(tx, Transaction):
             ValueError(f"Invalid params: tx={tx}")
 
@@ -124,7 +126,9 @@ class Client(object):
         response = self._send(Method.GET_STATUS, params)
         return response.result
 
-    def _send(self, method: str, params: Union[Transaction, Dict[str, str]] = None) -> RpcResponse:
+    def _send(
+        self, method: str, params: Union[Transaction, Dict[str, str]] = None
+    ) -> RpcResponse:
         request = RpcRequest(method, params)
         response = self._provider.send(request)
 

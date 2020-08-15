@@ -28,8 +28,8 @@ class Transaction(object):
         self,
         version: int,
         nid: int,
-        from_: Optional["Address"],
-        to: Optional["Address"],
+        from_: Optional[Address],
+        to: Optional[Address],
         step_limit: int,
         timestamp: int,
         signature: bytes,
@@ -89,14 +89,14 @@ class Transaction(object):
         return self._nid
 
     @property
-    def from_(self) -> "Address":
+    def from_(self) -> Address:
         """
         The account who created the transaction.
         """
         return self._from
 
     @property
-    def to(self) -> "Address":
+    def to(self) -> Address:
         """
         The account of tx to.
         """
@@ -180,7 +180,7 @@ class Transaction(object):
         nonce: int = cls._get_nonce(tx_dict.get("nonce"))
         data: Any = cls._get_data(tx_dict)
 
-        return Transaction(
+        return cls(
             version=version,
             nid=nid,
             nonce=nonce,

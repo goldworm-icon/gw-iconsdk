@@ -152,9 +152,7 @@ def str_to_object_by_type(
     if isinstance(value, str):
         return str_to_base_object_by_type(object_type, value)
     if isinstance(value, list):
-        return [
-            str_to_object_by_type(object_type[0], item) for item in value
-        ]
+        return [str_to_object_by_type(object_type[0], item) for item in value]
     if isinstance(value, dict):
         return {k: str_to_object_by_type(object_type[k], value[k]) for k in value}
 

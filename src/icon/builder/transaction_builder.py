@@ -37,7 +37,6 @@ PROTO_VERSION = 3
 
 
 class Transaction(Mapping):
-
     def __init__(self, params: Dict[str, str]):
         super().__init__()
         self._hash: bytes = generate_message_hash(params)
@@ -153,7 +152,9 @@ class CallTransactionBuilder(TransactionBuilder):
     def data(self, data: Union[Dict[str, Any], str]):
         raise CallException(f"data() is not allowed in {self.__class__.__name__}")
 
-    def call_data(self, method: str, params: Optional[Dict[str, str]]) -> "CallTransactionBuilder":
+    def call_data(
+        self, method: str, params: Optional[Dict[str, str]]
+    ) -> "CallTransactionBuilder":
         data = {"method": method}
         if isinstance(params, dict):
             data["params"] = params
@@ -170,7 +171,9 @@ class DeployTransactionBuilder(TransactionBuilder):
     def data(self, data: Union[Dict[str, Any], str]):
         raise CallException(f"data() is not allowed in {self.__class__.__name__}")
 
-    def deploy_data_from_bytes(self, data: bytes, params: Optional[Dict[str, Any]]) -> "DeployTransactionBuilder":
+    def deploy_data_from_bytes(
+        self, data: bytes, params: Optional[Dict[str, Any]]
+    ) -> "DeployTransactionBuilder":
         deploy_data = {"content": data, "contentType": "application/zip"}
 
         if params:
@@ -183,6 +186,8 @@ class DeployTransactionBuilder(TransactionBuilder):
         super().data(deploy_data)
         return self
 
-    def deploy_data_from_path(self, path: str, params: Optional[Dict[str, Any]]) -> "DeployTransactionBuilder":
+    def deploy_data_from_path(
+        self, path: str, params: Optional[Dict[str, Any]]
+    ) -> "DeployTransactionBuilder":
         data: bytes = gen_deploy_data_content(path)
         return self.deploy_data_from_bytes(data, params)
