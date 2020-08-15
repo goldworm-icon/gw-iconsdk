@@ -96,10 +96,18 @@ class Client(object):
         response = self._send(Method.GET_BLOCK, params)
         return response.result
 
-    def send_transaction(self, tx: Transaction) -> bytes:
+    def send_transaction(self, tx: Transaction, estimate: bool = False) -> Union[int, bytes]:
         if not isinstance(tx, Transaction):
-            ValueError(f"Invalid params: params={tx}")
+            ValueError(f"Invalid params: tx={tx}")
 
+        if estimate:
+            ret: int = self.estimate_step(tx)
+        else:
+            ret: bytes = self._send_transaction(tx)
+
+        return ret
+
+    def _send_transaction(self, tx: Transaction) -> bytes:
         response = self._send(Method.SEND_TRANSACTION, tx)
         return hex_to_bytes(response.result)
 

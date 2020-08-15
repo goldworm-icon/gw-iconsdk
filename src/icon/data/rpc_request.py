@@ -3,6 +3,8 @@
 from threading import Lock
 from typing import Optional, Dict
 
+from ..builder import Transaction
+
 
 class RpcRequest(object):
     _next_id = 0
@@ -40,7 +42,9 @@ class RpcRequest(object):
             "method": self._method,
         }
 
-        if self._params:
+        if isinstance(self._params, Transaction):
+            ret["params"] = self._params.to_dict()
+        elif isinstance(self._params, dict):
             ret["params"] = self._params
 
         return ret

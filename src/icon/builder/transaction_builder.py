@@ -21,9 +21,9 @@ __all__ = (
 )
 
 from base64 import standard_b64encode
-from collections import OrderedDict
+from collections import Mapping
 from time import time_ns
-from typing import Union, Dict, Any, Optional
+from typing import Union, Dict, Any, Optional, Iterator
 
 from .generic_builder import GenericBuilder
 from .key import Key, KeyFlag
@@ -36,10 +36,21 @@ from ..utils.serializer import generate_message_hash
 PROTO_VERSION = 3
 
 
-class Transaction(OrderedDict):
+class Transaction(Mapping):
+
     def __init__(self, params: Dict[str, str]):
-        super().__init__(params)
+        super().__init__()
         self._hash: bytes = generate_message_hash(params)
+        self._params = params
+
+    def __getitem__(self, k: str) -> str:
+        return self._params.__getitem__(k)
+
+    def __len__(self) -> int:
+        return self._params.__len__()
+
+    def __iter__(self) -> Iterator[str]:
+        return self._params.__iter__()
 
     @property
     def tx_hash(self) -> bytes:
@@ -47,8 +58,11 @@ class Transaction(OrderedDict):
 
     def sign(self, private_key: bytes) -> bytes:
         sign: bytes = sign_recoverable(self._hash, private_key)
-        self[Key.SIGNATURE] = standard_b64encode(sign).decode("utf-8")
+        self._params[Key.SIGNATURE] = standard_b64encode(sign).decode("utf-8")
         return sign
+
+    def to_dict(self) -> Dict[str, str]:
+        return self._params
 
 
 class TransactionBuilder(GenericBuilder):
