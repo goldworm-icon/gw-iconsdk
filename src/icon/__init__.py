@@ -18,7 +18,7 @@ from .builder.method import Method
 from .builder.query_builder import CallBuilder
 from .builder.transaction_builder import *
 from .client import Client
-from .data.address import Address, AddressPrefix
+from .data.address import *
 from .data.block import Block
 from .data.event_log import EventLog
 from .data.exception import SDKException

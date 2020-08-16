@@ -45,7 +45,7 @@ class HTTPProvider(Provider):
 
     def send(self, request: RpcRequest, **kwargs) -> RpcResponse:
         url = self._get_url(request.method)
-        print(url)
+        request.url = url
 
         response: requests.Response = requests.post(url, json=request.to_dict())
 

@@ -17,7 +17,12 @@
 """functions and classes to handle address
 """
 
-__all__ = ("AddressPrefix", "Address")
+__all__ = (
+    "AddressPrefix",
+    "Address",
+    "SYSTEM_SCORE_ADDRESS",
+    "GOVERNANCE_SCORE_ADDRESS",
+)
 
 import hashlib
 from enum import IntEnum
@@ -165,3 +170,7 @@ class Address(object):
     @classmethod
     def from_int(cls, prefix: AddressPrefix, value: int) -> "Address":
         return Address(prefix, value.to_bytes(20, "big"))
+
+
+SYSTEM_SCORE_ADDRESS = Address.from_int(AddressPrefix.CONTRACT, 0)
+GOVERNANCE_SCORE_ADDRESS = Address.from_int(AddressPrefix.CONTRACT, 1)

@@ -64,7 +64,7 @@ class TestClient(object):
     )
     def test_get_transaction_result(self, client, tx_hash: str):
         tx_hash: bytes = hex_to_bytes(tx_hash)
-        tx_result: "TransactionResult" = client.get_transaction_result(tx_hash)
+        tx_result: TransactionResult = client.get_transaction_result(tx_hash)
         assert tx_result.status == TransactionResult.Status.SUCCESS
         assert tx_result.tx_hash == tx_hash
 
@@ -72,4 +72,4 @@ class TestClient(object):
         ret: Dict[str, str] = client.get_score_api(
             Address.from_int(AddressPrefix.CONTRACT, 0)
         )
-        assert isinstance(ret, dict)
+        assert isinstance(ret, list)

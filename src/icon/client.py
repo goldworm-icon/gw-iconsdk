@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Any, Union
+from typing import Dict, Union, List, Callable
 
 from . import builder
 from .builder.method import Method
@@ -29,18 +29,9 @@ from .utils.type import str_to_int, bytes_to_hex, hex_to_bytes
 
 
 class Client(object):
-    def __init__(self, provider: Provider, defaults: Dict[str, Any] = None):
-        if defaults is None:
-            defaults = {}
-        elif not isinstance(defaults, dict):
-            raise ValueError(f"Invalid params: defaults={defaults}")
-
+    def __init__(self, provider: Provider, hooks: Dict[str, List[Callable]] = None):
         self._provider = provider
-        self._defaults = defaults
-
-    @property
-    def defaults(self) -> Dict[str, Any]:
-        return self._defaults
+        self._hooks = hooks
 
     def get_block_by_hash(self, block_hash: bytes) -> Block:
         params = {"hash": bytes_to_hex(block_hash)}
@@ -97,9 +88,9 @@ class Client(object):
         return response.result
 
     def send_transaction(
-        self, tx: Transaction, estimate: bool = False
+        self, tx: builder.Transaction, estimate: bool = False
     ) -> Union[int, bytes]:
-        if not isinstance(tx, Transaction):
+        if not isinstance(tx, builder.Transaction):
             ValueError(f"Invalid params: tx={tx}")
 
         if estimate:
@@ -109,8 +100,8 @@ class Client(object):
 
         return ret
 
-    def _send_transaction(self, tx: Transaction) -> bytes:
-        response = self._send(Method.SEND_TRANSACTION, tx)
+    def _send_transaction(self, tx: builder.Transaction) -> bytes:
+        response = self._send(Method.SEND_TRANSACTION, tx.to_dict())
         return hex_to_bytes(response.result)
 
     def call(self, params: Dict[str, str]) -> Union[str, Dict[str, str]]:
@@ -118,7 +109,7 @@ class Client(object):
         return response.result
 
     def estimate_step(self, tx: builder.Transaction) -> int:
-        response = self._send(Method.ESTIMATE_STEP, tx)
+        response = self._send(Method.ESTIMATE_STEP, tx.to_dict())
         return str_to_int(response.result)
 
     def get_status(self) -> Dict[str, str]:
@@ -130,6 +121,7 @@ class Client(object):
         self, method: str, params: Union[Transaction, Dict[str, str]] = None
     ) -> RpcResponse:
         request = RpcRequest(method, params)
+
         response = self._provider.send(request)
 
         if response.error:
