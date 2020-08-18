@@ -97,7 +97,7 @@ class KeyWallet(Wallet):
             keystore["address"] = str(self._address)
             keystore["coinType"] = "icx"
 
-            # validate the  contents of a keystore file.
+            # validate the contents of a keystore file.
             if not is_keystore_valid(keystore):
                 raise KeyStoreException("Invalid keystore")
 
@@ -113,10 +113,10 @@ class KeyWallet(Wallet):
             raise KeyStoreException("Directory is invalid")
 
     def sign(self, message_hash: bytes, recoverable: bool) -> bytes:
-        """Generates signature from input data which is transaction data
+        """Generates signature with message_hash
 
-        :param message_hash:
-        :param recoverable:
+        :param message_hash: 32-byte hash data
+        :param recoverable: If it is True, recoverable signature will be generated
         :return signature: signature made from input
         """
         return sign(message_hash, self._private_key, recoverable)

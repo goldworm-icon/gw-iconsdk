@@ -17,6 +17,7 @@ class SDKException(Exception):
         URL_ERROR = 7
         CALL_ERROR = 8
         ARG_ERROR = 9
+        HOOK_ERROR = 10
 
         def __str__(self) -> str:
             return str(self.name).capitalize().replace("_", " ")

@@ -52,7 +52,9 @@ class HTTPProvider(Provider):
         if "hooks" in kwargs:
             self._dispatch_hook("response", kwargs["hooks"], response)
 
-        return RpcResponse(response.json())
+        rpc_response = RpcResponse(response.json())
+        rpc_response.user_data = response
+        return rpc_response
 
     def _get_url(self, method: str) -> str:
         return self._debug_url if method == Method.ESTIMATE_STEP else self._url
