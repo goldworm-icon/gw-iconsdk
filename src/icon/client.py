@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Dict, Union, List, Callable
+from typing import Dict, Union, List, Callable, Optional
 
 from multimethod import multimethod
 
@@ -94,6 +94,10 @@ class Client(object):
         if not isinstance(tx, builder.Transaction):
             ValueError(f"Invalid params: tx={tx}")
 
+        private_key: Optional[bytes] = kwargs.get("private_key")
+        if isinstance(private_key, bytes):
+            tx.sign(private_key)
+
         if kwargs.get("estimate", False):
             ret: int = self.estimate_step(tx, **kwargs)
         else:
@@ -144,9 +148,11 @@ class Client(object):
         return response
 
     @multimethod
-    def send_request(self, method: str, params: Dict[str, str]) -> RpcResponse:
+    def send_request(
+        self, method: str, params: Dict[str, str], **kwargs
+    ) -> RpcResponse:
         request = RpcRequest(method, params)
-        return self.send_request(request)
+        return self.send_request(request, **kwargs)
 
     @classmethod
     def _dispatch_hook(cls, key: str, hooks, hook_data: Union[RpcRequest, RpcResponse]):

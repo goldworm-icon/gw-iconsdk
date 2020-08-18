@@ -55,7 +55,10 @@ class Transaction(Mapping):
     def tx_hash(self) -> bytes:
         return self._hash
 
-    def sign(self, private_key: bytes) -> bytes:
+    def sign(self, private_key: bytes) -> Optional[bytes]:
+        if Key.SIGNATURE in self._params:
+            return None
+
         signature: bytes = sign(self._hash, private_key, recoverable=True)
         self._params[Key.SIGNATURE] = standard_b64encode(signature).decode("utf-8")
         return signature
