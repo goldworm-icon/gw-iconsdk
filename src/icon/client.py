@@ -1,17 +1,4 @@
 # -*- coding: utf-8 -*-
-# Copyright 2020 ICON Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 from typing import Dict, Union, List, Callable
 
@@ -21,8 +8,11 @@ from . import builder
 from .builder.method import Method
 from .data.address import Address
 from .data.block import Block
-from .data.exception import JSONRPCException, ArgumentException
-from .data.exception import SDKException
+from .data.exception import (
+    ArgumentException,
+    HookException,
+    JSONRPCException,
+)
 from .data.rpc_request import RpcRequest
 from .data.rpc_response import RpcResponse
 from .data.transaction import Transaction
@@ -139,27 +129,17 @@ class Client(object):
         # hooks for request
         ret: bool = self._dispatch_hook("request", hooks, request)
         if not ret:
-            return RpcResponse(
-                {
-                    "code": SDKException.Code.HOOK_ERROR,
-                    "message": "Failed to run hooks for request",
-                }
-            )
+            raise HookException(f"request hooks stopped", request)
 
         response = self._provider.send(request)
 
         # hooks for response
         ret: bool = self._dispatch_hook("response", hooks, response)
         if not ret:
-            return RpcResponse(
-                {
-                    "code": SDKException.Code.HOOK_ERROR,
-                    "message": "Failed to run hooks for request",
-                }
-            )
+            raise HookException(f"response hooks stopped", response)
 
         if response.error:
-            raise JSONRPCException(f"{response.error}")
+            raise JSONRPCException(f"{response.error}", response)
 
         return response
 

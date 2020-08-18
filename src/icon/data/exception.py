@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from enum import IntEnum, unique
-from typing import Optional
+from typing import Optional, Any
 
 
 class SDKException(Exception):
@@ -22,17 +22,22 @@ class SDKException(Exception):
         def __str__(self) -> str:
             return str(self.name).capitalize().replace("_", " ")
 
-    def __init__(self, code: Code, message: Optional[str]):
+    def __init__(self, code: Code, message: Optional[str], user_data: Any = None):
         self._code = code
         self._message = message if isinstance(message, str) else str(code)
+        self._user_data = user_data
+
+    @property
+    def code(self):
+        return self._code
 
     @property
     def message(self):
         return self._message
 
     @property
-    def code(self):
-        return self._code
+    def user_data(self) -> Any:
+        return self._user_data
 
     def __str__(self):
         return f"{self.message} ({self._code.value})"
@@ -41,60 +46,65 @@ class SDKException(Exception):
 class KeyStoreException(SDKException):
     """"Error when making or loading a keystore file."""
 
-    def __init__(self, message: Optional[str]):
-        super().__init__(SDKException.Code.KEY_STORE_ERROR, message)
+    def __init__(self, message: Optional[str], user_data: Any = None):
+        super().__init__(SDKException.Code.KEY_STORE_ERROR, message, user_data)
 
 
 class AddressException(SDKException):
     """Error when having an invalid address."""
 
-    def __init__(self, message: Optional[str]):
-        super().__init__(SDKException.Code.ADDRESS_ERROR, message)
+    def __init__(self, message: Optional[str], user_data: Any = None):
+        super().__init__(SDKException.Code.ADDRESS_ERROR, message, user_data)
 
 
 class BalanceException(SDKException):
     """Error when having an invalid balance."""
 
-    def __init__(self, message: Optional[str]):
-        super().__init__(SDKException.Code.BALANCE_ERROR, message)
+    def __init__(self, message: Optional[str], user_data: Any = None):
+        super().__init__(SDKException.Code.BALANCE_ERROR, message, user_data)
 
 
 class DataTypeException(SDKException):
     """Error when data type is invalid."""
 
-    def __init__(self, message: Optional[str]):
-        super().__init__(SDKException.Code.DATA_TYPE_ERROR, message)
+    def __init__(self, message: Optional[str], user_data: Any = None):
+        super().__init__(SDKException.Code.DATA_TYPE_ERROR, message, user_data)
 
 
 class ArgumentException(SDKException):
-    def __init__(self, message: Optional[str]):
-        super().__init__(SDKException.Code.ARG_ERROR, message)
+    def __init__(self, message: Optional[str], user_data: Any = None):
+        super().__init__(SDKException.Code.ARG_ERROR, message, user_data)
 
 
 class JSONRPCException(SDKException):
     """Error when get JSON-RPC Error Response."""
 
-    def __init__(self, message: Optional[str]):
-        super().__init__(SDKException.Code.JSON_RPC_ERROR, message)
+    def __init__(self, message: Optional[str], user_data: Any = None):
+        super().__init__(SDKException.Code.JSON_RPC_ERROR, message, user_data)
 
 
 class ZipException(SDKException):
     """"Error while write zip in memory"""
 
-    def __init__(self, message: Optional[str]):
-        super().__init__(SDKException.Code.ZIP_MEMORY_ERROR, message)
+    def __init__(self, message: Optional[str], user_data: Any = None):
+        super().__init__(SDKException.Code.ZIP_MEMORY_ERROR, message, user_data)
 
 
 class URLException(SDKException):
     """Error regarding invalid URL"""
 
-    def __init__(self, message: Optional[str]):
-        super().__init__(SDKException.Code.URL_ERROR, message)
+    def __init__(self, message: Optional[str], user_data: Any = None):
+        super().__init__(SDKException.Code.URL_ERROR, message, user_data)
 
 
 class CallException(SDKException):
     """Error for sdk method misuse
     """
 
-    def __init__(self, message: Optional[str]):
-        super().__init__(SDKException.Code.CALL_ERROR, message)
+    def __init__(self, message: Optional[str], user_data: Any = None):
+        super().__init__(SDKException.Code.CALL_ERROR, message, user_data)
+
+
+class HookException(SDKException):
+    def __init__(self, message: Optional[str], user_data: Any = None):
+        super().__init__(SDKException.Code.HOOK_ERROR, message, user_data)

@@ -22,8 +22,11 @@ from .data.address import *
 from .data.block import Block
 from .data.event_log import EventLog
 from .data.exception import SDKException
+from .data.rpc_request import RpcRequest
+from .data.rpc_response import RpcResponse
 from .data.transaction import Transaction
 from .data.transaction_result import TransactionResult
 from .provider.http_provider import HTTPProvider
+from .provider.provider import Provider
 from .utils.type import *
 from .wallet.wallet import KeyWallet

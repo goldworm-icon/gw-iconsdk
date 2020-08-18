@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 
+import random
 from typing import Dict
 
 import icon
 import pytest
+from icon.builder.method import Method
 from icon.data.address import Address, AddressPrefix
+from icon.data.exception import HookException
+from icon.data.exception import SDKException
+from icon.data.rpc_request import RpcRequest
+from icon.data.rpc_response import RpcResponse
 from icon.data.transaction import Transaction
 from icon.data.transaction_result import TransactionResult
 from icon.utils.type import hex_to_bytes
@@ -42,7 +48,7 @@ class TestClient(object):
     )
     def test_get_transaction(self, client, tx_hash: str):
         tx_hash: bytes = hex_to_bytes(tx_hash)
-        tx: "Transaction" = client.get_transaction(tx_hash)
+        tx: Transaction = client.get_transaction(tx_hash)
         assert tx.version == 3
         assert tx.nid == 1
         assert tx.tx_hash == tx_hash
@@ -73,3 +79,63 @@ class TestClient(object):
             Address.from_int(AddressPrefix.CONTRACT, 0)
         )
         assert isinstance(ret, list)
+
+    @pytest.mark.parametrize("hook_ret", [True, False])
+    def test_request_hooks(self, dummy_provider, address, hook_ret):
+        def hook(req: RpcRequest):
+            assert req.method == Method.GET_BALANCE
+            return hook_ret
+
+        value = random.randint(0, 9999)
+        dummy_response = RpcResponse(
+            json={"jsonrpc": "2.0", "id": 0, "result": hex(value)}
+        )
+
+        dummy_provider.response = dummy_response
+        client = icon.Client(dummy_provider)
+        hooks = {"request": hook}
+
+        if hook_ret:
+            balance: int = client.get_balance(address, hooks=hooks)
+            assert balance == value
+        else:
+            with pytest.raises(HookException) as excinfo:
+                _: int = client.get_balance(address, hooks=hooks)
+
+            e: HookException = excinfo.value
+            assert e.code == SDKException.Code.HOOK_ERROR
+            assert isinstance(e.user_data, RpcRequest)
+
+            request: RpcRequest = e.user_data
+            assert request.method == Method.GET_BALANCE
+            assert request.params["address"] == str(address)
+
+    @pytest.mark.parametrize("hook_ret", [True, False])
+    def test_response_hooks(self, dummy_provider, address, hook_ret):
+        def hook(res: RpcResponse):
+            assert res.error is None
+            assert isinstance(res.result, str)
+            return hook_ret
+
+        value = random.randint(0, 9999)
+        dummy_response = RpcResponse(
+            json={"jsonrpc": "2.0", "id": 0, "result": hex(value)}
+        )
+
+        dummy_provider.response = dummy_response
+        client = icon.Client(dummy_provider)
+        hooks = {"response": hook}
+
+        if hook_ret:
+            balance: int = client.get_balance(address, hooks=hooks)
+            assert balance == value
+        else:
+            with pytest.raises(HookException) as excinfo:
+                _: int = client.get_balance(address, hooks=hooks)
+
+            e: HookException = excinfo.value
+            assert e.code == SDKException.Code.HOOK_ERROR
+            assert isinstance(e.user_data, RpcResponse)
+
+            response: RpcResponse = e.user_data
+            assert response == dummy_response

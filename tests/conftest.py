@@ -17,9 +17,8 @@ import os
 import time
 from typing import Callable
 
+import icon
 import pytest
-from icon.data.address import Address, AddressPrefix
-from icon.wallet.wallet import KeyWallet
 
 
 @pytest.fixture(scope="function")
@@ -43,14 +42,14 @@ def block_hash() -> bytes:
 
 
 @pytest.fixture(scope="function")
-def address() -> "Address":
-    return Address(AddressPrefix.EOA, os.urandom(20))
+def address() -> icon.Address:
+    return icon.Address(icon.AddressPrefix.EOA, os.urandom(20))
 
 
 @pytest.fixture(scope="session")
-def create_address() -> Callable[[], "Address"]:
+def create_address() -> Callable[[], icon.Address]:
     def func():
-        return Address(AddressPrefix.EOA, os.urandom(20))
+        return icon.Address(icon.AddressPrefix.EOA, os.urandom(20))
 
     return func
 
@@ -73,5 +72,26 @@ def logs_bloom() -> bytes:
 
 
 @pytest.fixture
-def wallet() -> KeyWallet:
-    return KeyWallet()
+def wallet() -> icon.KeyWallet:
+    return icon.KeyWallet()
+
+
+class DummyProvider(icon.Provider):
+    def __init__(self):
+        self._response = None
+
+    @property
+    def response(self) -> icon.RpcResponse:
+        return self._response
+
+    @response.setter
+    def response(self, value: icon.RpcResponse):
+        self._response = value
+
+    def send(self, request: icon.RpcRequest) -> icon.RpcResponse:
+        return self._response
+
+
+@pytest.fixture
+def dummy_provider():
+    return DummyProvider()
