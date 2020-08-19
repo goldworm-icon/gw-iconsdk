@@ -28,7 +28,7 @@ from typing import Union, Dict, Any, Optional, Iterator
 from .generic_builder import GenericBuilder
 from .key import Key, KeyFlag
 from ..data.address import Address
-from ..data.exception import CallException, DataTypeException
+from icon.exception import CallException, DataTypeException
 from ..utils.crypto import sign
 from ..utils.in_memory_zip import gen_deploy_data_content
 from ..utils.serializer import generate_message_hash

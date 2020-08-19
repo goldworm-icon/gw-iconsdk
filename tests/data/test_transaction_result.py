@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from icon.data import bytes_to_hex
 from icon.data.transaction_result import TransactionResult
-from icon.utils.type import bytes_to_hex
 
 
 class TestTransactionResult(object):

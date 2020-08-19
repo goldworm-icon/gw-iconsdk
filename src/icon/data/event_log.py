@@ -16,7 +16,7 @@
 from typing import List, Dict, Tuple, Union
 
 from .address import Address
-from ..utils.type import str_to_base_object_by_typename, base_object_to_str
+from icon.data.utils import str_to_base_object_by_typename, base_object_to_str
 
 
 class EventLog(object):

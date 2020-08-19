@@ -2,23 +2,23 @@
 
 from typing import Dict, Union, List, Callable, Optional
 
+from icon.exception import (
+    ArgumentException,
+    HookException,
+    JSONRPCException,
+)
 from multimethod import multimethod
 
 from . import builder
 from .builder.method import Method
 from .data.address import Address
 from .data.block import Block
-from .data.exception import (
-    ArgumentException,
-    HookException,
-    JSONRPCException,
-)
 from .data.rpc_request import RpcRequest
 from .data.rpc_response import RpcResponse
 from .data.transaction import Transaction
 from .data.transaction_result import TransactionResult
 from .provider.provider import Provider
-from .utils.type import str_to_int, bytes_to_hex, hex_to_bytes
+from icon.data.utils import str_to_int, bytes_to_hex, hex_to_bytes
 
 
 class Client(object):

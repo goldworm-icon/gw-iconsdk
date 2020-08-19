@@ -6,8 +6,8 @@ from enum import IntEnum, auto
 from typing import Optional, Dict, Union, Any
 
 from .address import Address
-from .exception import JSONRPCException
-from ..utils.type import str_to_int, hex_to_bytes, bytes_to_hex
+from icon.exception import JSONRPCException
+from icon.data.utils import str_to_int, hex_to_bytes, bytes_to_hex
 
 
 class DataType(IntEnum):

@@ -19,7 +19,7 @@ from typing import Optional
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from ..constant import PACKAGE_JSON_FILE
-from ..data.exception import ZipException
+from icon.exception import ZipException
 
 
 def gen_deploy_data_content(path: str) -> bytes:

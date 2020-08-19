@@ -5,22 +5,18 @@ from typing import Dict
 
 import icon
 import pytest
-from icon.builder.method import Method
-from icon.data.address import Address, AddressPrefix
-from icon.data.exception import HookException
-from icon.data.exception import SDKException
-from icon.data.rpc_request import RpcRequest
-from icon.data.rpc_response import RpcResponse
-from icon.data.transaction import Transaction
-from icon.data.transaction_result import TransactionResult
-from icon.utils.type import hex_to_bytes
+from icon.builder import Method
+from icon.data import *
+from icon.data.utils import hex_to_bytes
+from icon.exception import HookException, SDKException
+from icon.provider import HTTPProvider
 
 
 class TestClient(object):
     @pytest.fixture(scope="class")
     def client(self):
         base_url = "https://ctz.solidwallet.io"
-        provider = icon.HTTPProvider(base_url, version=3)
+        provider = HTTPProvider(base_url, version=3)
 
         return icon.Client(provider)
 
