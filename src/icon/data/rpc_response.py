@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 from typing import Dict, Optional, Union, Any
 
 
@@ -7,6 +8,9 @@ class RpcResponse(object):
     def __init__(self, json: Dict[str, Any]):
         self._json = json
         self._user_data = None
+
+    def __str__(self):
+        return json.dumps(self._json, indent=4)
 
     @property
     def error(self) -> Optional[Dict[str, Union[int, str]]]:

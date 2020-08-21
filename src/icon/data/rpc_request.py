@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 import random
 from threading import Lock
 from typing import Optional, Dict, Any
@@ -18,6 +19,9 @@ class RpcRequest(object):
         self._method = method
         self._params = params
         self._user_data = None
+
+    def __str__(self):
+        return json.dumps(self.to_dict(), indent=4)
 
     @classmethod
     def _get_next_id(cls) -> int:
