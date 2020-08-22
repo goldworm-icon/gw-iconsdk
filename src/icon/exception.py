@@ -15,7 +15,7 @@ class SDKException(Exception):
         JSON_RPC_ERROR = 5
         ZIP_MEMORY_ERROR = 6
         URL_ERROR = 7
-        CALL_ERROR = 8
+        BUILDER_ERROR = 8
         ARG_ERROR = 9
         HOOK_ERROR = 10
 
@@ -97,12 +97,12 @@ class URLException(SDKException):
         super().__init__(SDKException.Code.URL_ERROR, message, user_data)
 
 
-class CallException(SDKException):
+class BuilderException(SDKException):
     """Error for sdk method misuse
     """
 
     def __init__(self, message: Optional[str], user_data: Any = None):
-        super().__init__(SDKException.Code.CALL_ERROR, message, user_data)
+        super().__init__(SDKException.Code.BUILDER_ERROR, message, user_data)
 
 
 class HookException(SDKException):

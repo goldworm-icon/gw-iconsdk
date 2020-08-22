@@ -2,6 +2,7 @@
 
 from typing import Dict, Union, List, Callable, Optional
 
+from icon.data.utils import str_to_int, bytes_to_hex, hex_to_bytes
 from icon.exception import (
     ArgumentException,
     HookException,
@@ -18,7 +19,6 @@ from .data.rpc_response import RpcResponse
 from .data.transaction import Transaction
 from .data.transaction_result import TransactionResult
 from .provider.provider import Provider
-from icon.data.utils import str_to_int, bytes_to_hex, hex_to_bytes
 
 
 class Client(object):

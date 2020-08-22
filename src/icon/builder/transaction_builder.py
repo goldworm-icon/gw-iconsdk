@@ -18,6 +18,7 @@ __all__ = (
     "TransactionBuilder",
     "CallTransactionBuilder",
     "DeployTransactionBuilder",
+    "MessageTransactionBuilder",
 )
 
 from base64 import standard_b64encode
@@ -25,10 +26,12 @@ from collections import Mapping
 from time import time_ns
 from typing import Union, Dict, Any, Optional, Iterator
 
+from icon.data import bytes_to_hex
+from icon.exception import BuilderException, DataTypeException
+
 from .generic_builder import GenericBuilder
 from .key import Key, KeyFlag
 from ..data.address import Address
-from icon.exception import CallException, DataTypeException
 from ..utils.crypto import sign
 from ..utils.in_memory_zip import gen_deploy_data_content
 from ..utils.serializer import generate_message_hash
@@ -148,12 +151,31 @@ class TransactionBuilder(GenericBuilder):
         return Transaction(params)
 
 
+class MessageTransactionBuilder(TransactionBuilder):
+    def __init__(self):
+        super().__init__()
+
+    def data_type(self, data_type: str):
+        raise BuilderException(f"data_type() is not allowed in {self.__class__.__name__}")
+
+    def data(self, data: Union[Dict[str, Any], str]):
+        raise BuilderException(f"data() is not allowed in {self.__class__.__name__}")
+
+    def message_data(self, data: bytes) -> "MessageTransactionBuilder":
+        self.add(Key.DATA_TYPE, "message")
+        self.add(Key.DATA, bytes_to_hex(data))
+        return self
+
+
 class CallTransactionBuilder(TransactionBuilder):
     def __init__(self):
         super().__init__()
 
+    def data_type(self, data_type: str):
+        raise BuilderException(f"data_type() is not allowed in {self.__class__.__name__}")
+
     def data(self, data: Union[Dict[str, Any], str]):
-        raise CallException(f"data() is not allowed in {self.__class__.__name__}")
+        raise BuilderException(f"data() is not allowed in {self.__class__.__name__}")
 
     def call_data(
         self, method: str, params: Optional[Dict[str, str]]
@@ -171,8 +193,11 @@ class DeployTransactionBuilder(TransactionBuilder):
     def __init__(self):
         super().__init__()
 
+    def data_type(self, data_type: str):
+        raise BuilderException(f"data_type() is not allowed in {self.__class__.__name__}")
+
     def data(self, data: Union[Dict[str, Any], str]):
-        raise CallException(f"data() is not allowed in {self.__class__.__name__}")
+        raise BuilderException(f"data() is not allowed in {self.__class__.__name__}")
 
     def deploy_data_from_bytes(
         self, data: bytes, params: Optional[Dict[str, Any]]

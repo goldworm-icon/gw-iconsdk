@@ -5,6 +5,7 @@ __all__ = (
     "CallTransactionBuilder",
     "DeployTransactionBuilder",
     "GenericBuilder",
+    "MessageTransactionBuilder",
     "Key",
     "Method",
     "Transaction",
@@ -20,4 +21,5 @@ from .transaction_builder import (
     TransactionBuilder,
     CallTransactionBuilder,
     DeployTransactionBuilder,
+    MessageTransactionBuilder,
 )
