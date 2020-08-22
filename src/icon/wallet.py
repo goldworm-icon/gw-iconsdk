@@ -3,20 +3,35 @@
 import json
 import os
 from abc import ABCMeta, abstractmethod
+from typing import Dict
 
-from eth_keyfile import create_keyfile_json, extract_key_from_keyfile
-
-from ..data.address import Address
+from eth_keyfile import (
+    create_keyfile_json,
+    extract_key_from_keyfile,
+    load_keyfile,
+)
+from icon.data.address import Address
 from icon.exception import KeyStoreException
-from ..utils.crypto import sign, verify_signature, create_key_pair
-from ..utils.utils import is_keystore_valid
+from icon.utils.crypto import sign, verify_signature, create_key_pair
+from icon.utils.utils import is_keystore_valid
 
 
 class Wallet(metaclass=ABCMeta):
     """An interface `Wallet` has 2 abstract methods, `get_address()` and `sign(hash: str)`."""
 
+    @property
     @abstractmethod
     def address(self) -> Address:
+        pass
+
+    @property
+    @abstractmethod
+    def private_key(self) -> bytes:
+        pass
+
+    @property
+    @abstractmethod
+    def public_key(self) -> bytes:
         pass
 
     @abstractmethod
@@ -41,6 +56,16 @@ class KeyWallet(Wallet):
         self._private_key, self._public_key = create_key_pair(private_key)
         self._address = Address.from_public_key(self._public_key)
 
+    def __eq__(self, other) -> bool:
+        return self._private_key == other.private_key
+
+    def __ne__(self, other) -> bool:
+        return not self.__eq__(other)
+
+    @property
+    def address(self) -> Address:
+        return self._address
+
     @property
     def private_key(self) -> bytes:
         return self._private_key
@@ -48,10 +73,6 @@ class KeyWallet(Wallet):
     @property
     def public_key(self) -> bytes:
         return self._public_key
-
-    @property
-    def address(self) -> Address:
-        return self._address
 
     @staticmethod
     def load(file_path: str, password: str) -> "KeyWallet":
@@ -74,7 +95,7 @@ class KeyWallet(Wallet):
         except ValueError:
             raise KeyStoreException("Password is wrong.")
         except Exception as e:
-            raise KeyStoreException(f"keystore file error.{e}")
+            raise KeyStoreException(f"keystore file error: {e}")
 
     def save(self, path: str, password: str):
         """Stores data of an instance of a derived wallet class on the file path with your password.
@@ -123,3 +144,45 @@ class KeyWallet(Wallet):
 
     def verify_signature(self, signature: bytes, message_hash: bytes) -> bool:
         return verify_signature(signature, message_hash, self._public_key)
+
+
+class LightWallet(Wallet):
+    def __init__(self, keyfile_json: Dict[str, str]):
+        self._keyfile_json: Dict[str, str] = keyfile_json
+        self._address = Address.from_string(keyfile_json["address"])
+
+    def __eq__(self, other) -> bool:
+        return self._keyfile_json == other.keyfile_json
+
+    def __ne__(self, other) -> bool:
+        return not self.__eq__(other)
+
+    @property
+    def address(self) -> Address:
+        return self._address
+
+    @property
+    def private_key(self) -> bytes:
+        raise KeyStoreException("Not supported: private_key")
+
+    @property
+    def public_key(self) -> bytes:
+        raise KeyStoreException("Not supported: public_key")
+
+    @property
+    def keyfile_json(self) -> Dict[str, str]:
+        return self._keyfile_json
+
+    def sign(self, message_hash: bytes, recoverable: bool) -> bytes:
+        raise KeyStoreException("Not supported: sign")
+
+    def verify_signature(self, signature: bytes, message_hash: bytes) -> bool:
+        raise KeyStoreException("Not supported: verify_signature")
+
+    @classmethod
+    def load(cls, path: str) -> "LightWallet":
+        return cls.from_path(path)
+
+    @classmethod
+    def from_path(cls, path: str) -> "LightWallet":
+        return cls(load_keyfile(path))

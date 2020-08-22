@@ -5,7 +5,7 @@ from base64 import standard_b64decode
 from icon.builder import Transaction
 from icon.builder.key import Key
 from icon.builder.transaction_builder import TransactionBuilder
-from icon.wallet.wallet import KeyWallet
+from icon.wallet import KeyWallet
 
 
 def test_transaction_builder(wallet: KeyWallet, address):
