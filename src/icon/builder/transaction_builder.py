@@ -26,7 +26,7 @@ from collections import Mapping
 from time import time_ns
 from typing import Union, Dict, Any, Optional, Iterator
 
-from icon.data import bytes_to_hex
+from icon.data.utils import bytes_to_hex
 from icon.exception import BuilderException, DataTypeException
 
 from .generic_builder import GenericBuilder
