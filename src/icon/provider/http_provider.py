@@ -15,10 +15,10 @@
 
 import requests
 
+from .provider import Provider
 from ..builder.method import Method
 from ..data.rpc_request import RpcRequest
 from ..data.rpc_response import RpcResponse
-from ..provider.provider import Provider
 
 
 class HTTPProvider(Provider):

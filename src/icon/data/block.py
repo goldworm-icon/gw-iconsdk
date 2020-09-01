@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
 import base64
 from typing import Dict, List, Union, Optional
+
+from icon.data.utils import hex_to_bytes, str_to_int, bytes_to_hex
 
 from .address import Address
 from .transaction import Transaction
 from ..builder.key import Key
-from icon.data.utils import hex_to_bytes, str_to_int, bytes_to_hex
 
 
 def _get_timestamp(block_dict: dict) -> int:
@@ -121,7 +124,7 @@ class Block(object):
         return self._transactions
 
     @classmethod
-    def from_dict(cls, data: Dict) -> "Block":
+    def from_dict(cls, data: Dict) -> Block:
         version: str = data[Key.VERSION]
         height: int = str_to_int(data["height"])
         block_hash: bytes = hex_to_bytes(data["block_hash"])

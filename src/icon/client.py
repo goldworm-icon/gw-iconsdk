@@ -2,12 +2,6 @@
 
 from typing import Dict, Union, List, Callable, Optional
 
-from icon.data.utils import str_to_int, bytes_to_hex, hex_to_bytes
-from icon.exception import (
-    ArgumentException,
-    HookException,
-    JSONRPCException,
-)
 from multimethod import multimethod
 
 from . import builder
@@ -18,6 +12,12 @@ from .data.rpc_request import RpcRequest
 from .data.rpc_response import RpcResponse
 from .data.transaction import Transaction
 from .data.transaction_result import TransactionResult
+from .data.utils import str_to_int, bytes_to_hex, hex_to_bytes
+from .exception import (
+    ArgumentException,
+    HookException,
+    JSONRPCException,
+)
 from .provider.provider import Provider
 
 

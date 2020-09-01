@@ -18,7 +18,7 @@ __all__ = (
     "Address",
     "AddressPrefix",
     "Block",
-    "EventLog",
+    "Eventlog",
     "RpcRequest",
     "RpcResponse",
     "Transaction",
@@ -38,9 +38,14 @@ __all__ = (
     "is_base_object_type",
 )
 
-from .address import Address, AddressPrefix, SYSTEM_SCORE_ADDRESS, GOVERNANCE_SCORE_ADDRESS
+from .address import (
+    Address,
+    AddressPrefix,
+    SYSTEM_SCORE_ADDRESS,
+    GOVERNANCE_SCORE_ADDRESS,
+)
 from .block import Block
-from .event_log import EventLog
+from .eventlog import Eventlog
 from .rpc_request import RpcRequest
 from .rpc_response import RpcResponse
 from .transaction import Transaction

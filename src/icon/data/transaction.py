@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
 import base64
 import json
 from enum import IntEnum, auto
 from typing import Optional, Dict, Union, Any
 
 from .address import Address
-from icon.exception import JSONRPCException
-from icon.data.utils import str_to_int, hex_to_bytes, bytes_to_hex
+from .utils import str_to_int, hex_to_bytes, bytes_to_hex
+from ..exception import JSONRPCException
 
 
 class DataType(IntEnum):
@@ -158,12 +160,12 @@ class Transaction(object):
         return self._signature
 
     @classmethod
-    def from_bytes(cls, data: bytes) -> "Transaction":
+    def from_bytes(cls, data: bytes) -> Transaction:
         data = json.loads(data)
         return cls.from_dict(data)
 
     @classmethod
-    def from_dict(cls, tx_dict: Dict[str, str]) -> "Transaction":
+    def from_dict(cls, tx_dict: Dict[str, str]) -> Transaction:
         version = str_to_int(tx_dict["version"])
         nid = str_to_int(tx_dict["nid"])
         from_ = Address.from_string(tx_dict["from"])

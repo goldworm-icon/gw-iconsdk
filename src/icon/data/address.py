@@ -17,6 +17,8 @@
 """functions and classes to handle address
 """
 
+from __future__ import annotations
+
 __all__ = (
     "AddressPrefix",
     "Address",
@@ -49,7 +51,7 @@ class AddressPrefix(IntEnum):
             return _CONTRACT_PREFIX
 
     @staticmethod
-    def from_string(prefix: str) -> "AddressPrefix":
+    def from_string(prefix: str) -> AddressPrefix:
         """
         Returns address prefix enumerator
 
@@ -141,7 +143,7 @@ class Address(object):
         return self._prefix is AddressPrefix.CONTRACT
 
     @classmethod
-    def from_string(cls, address: str) -> "Address":
+    def from_string(cls, address: str) -> Address:
         """
         creates an address object from given 42-char string `address`
 
@@ -158,7 +160,7 @@ class Address(object):
         return Address(prefix, body)
 
     @classmethod
-    def from_public_key(cls, public_key: bytes) -> "Address":
+    def from_public_key(cls, public_key: bytes) -> Address:
         if not isinstance(public_key, bytes):
             raise TypeError("Invalid type")
         if not (len(public_key) == 65 and public_key[0] == 0x04):
@@ -168,7 +170,7 @@ class Address(object):
         return Address(AddressPrefix.EOA, body)
 
     @classmethod
-    def from_int(cls, prefix: AddressPrefix, value: int) -> "Address":
+    def from_int(cls, prefix: AddressPrefix, value: int) -> Address:
         return Address(prefix, value.to_bytes(20, "big"))
 
 

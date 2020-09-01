@@ -5,8 +5,8 @@ from typing import Dict, Optional, Union, Any
 
 
 class RpcResponse(object):
-    def __init__(self, json: Dict[str, Any]):
-        self._json = json
+    def __init__(self, json_text: Dict[str, Any]):
+        self._json = json_text
         self._user_data = None
 
     def __str__(self):

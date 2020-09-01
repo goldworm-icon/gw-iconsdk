@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
 import json
 import os
 from abc import ABCMeta, abstractmethod
@@ -10,10 +12,11 @@ from eth_keyfile import (
     extract_key_from_keyfile,
     load_keyfile,
 )
-from icon.data.address import Address
-from icon.exception import KeyStoreException
-from icon.utils.crypto import sign, verify_signature, create_key_pair
-from icon.utils.utils import is_keystore_valid
+
+from .data.address import Address
+from .exception import KeyStoreException
+from .utils.crypto import sign, verify_signature, create_key_pair
+from .utils.utils import is_keystore_valid
 
 
 class Wallet(metaclass=ABCMeta):
@@ -75,7 +78,7 @@ class KeyWallet(Wallet):
         return self._public_key
 
     @staticmethod
-    def load(file_path: str, password: str) -> "KeyWallet":
+    def load(file_path: str, password: str) -> KeyWallet:
         """Loads a wallet from a keystore file with your password and generates an instance of Wallet.
 
         :param file_path: File path of the keystore file. type(str)
@@ -180,9 +183,9 @@ class LightWallet(Wallet):
         raise KeyStoreException("Not supported: verify_signature")
 
     @classmethod
-    def load(cls, path: str) -> "LightWallet":
+    def load(cls, path: str) -> LightWallet:
         return cls.from_path(path)
 
     @classmethod
-    def from_path(cls, path: str) -> "LightWallet":
+    def from_path(cls, path: str) -> LightWallet:
         return cls(load_keyfile(path))

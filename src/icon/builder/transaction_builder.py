@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 __all__ = (
     "Transaction",
     "TransactionBuilder",
@@ -26,12 +28,11 @@ from collections import Mapping
 from time import time_ns
 from typing import Union, Dict, Any, Optional, Iterator
 
-from icon.data.utils import bytes_to_hex
-from icon.exception import BuilderException, DataTypeException
-
 from .generic_builder import GenericBuilder
 from .key import Key, KeyFlag
 from ..data.address import Address
+from ..data.utils import bytes_to_hex
+from ..exception import BuilderException, DataTypeException
 from ..utils.crypto import sign
 from ..utils.in_memory_zip import gen_deploy_data_content
 from ..utils.serializer import generate_message_hash
@@ -87,57 +88,57 @@ class TransactionBuilder(GenericBuilder):
         else:
             self._flags &= ~flag
 
-    def version(self, version: int) -> "TransactionBuilder":
+    def version(self, version: int) -> TransactionBuilder:
         self.add(Key.VERSION, version)
         self._set_flag(KeyFlag.VERSION, True)
         return self
 
-    def from_(self, from_: Address) -> "TransactionBuilder":
+    def from_(self, from_: Address) -> TransactionBuilder:
         self.add(Key.FROM, from_)
         self._set_flag(KeyFlag.FROM, True)
         return self
 
-    def to(self, to: Address) -> "TransactionBuilder":
+    def to(self, to: Address) -> TransactionBuilder:
         self.add(Key.TO, to)
         self._set_flag(KeyFlag.TO, True)
         return self
 
-    def value(self, value: int) -> "TransactionBuilder":
+    def value(self, value: int) -> TransactionBuilder:
         self.add(Key.VALUE, value)
         self._set_flag(KeyFlag.VALUE, True)
         return self
 
-    def step_limit(self, step_limit: int) -> "TransactionBuilder":
+    def step_limit(self, step_limit: int) -> TransactionBuilder:
         self.add(Key.STEP_LIMIT, step_limit)
         self._set_flag(KeyFlag.STEP_LIMIT, True)
         return self
 
-    def timestamp(self, timestamp_us: int) -> "TransactionBuilder":
+    def timestamp(self, timestamp_us: int) -> TransactionBuilder:
         self.add(Key.TIMESTAMP, timestamp_us)
         self._set_flag(KeyFlag.TIMESTAMP, True)
         return self
 
-    def nid(self, nid: int) -> "TransactionBuilder":
+    def nid(self, nid: int) -> TransactionBuilder:
         self.add(Key.NID, nid)
         self._set_flag(KeyFlag.NID, True)
         return self
 
-    def nonce(self, nonce: int) -> "TransactionBuilder":
+    def nonce(self, nonce: int) -> TransactionBuilder:
         self.add(Key.NONCE, nonce)
         self._set_flag(KeyFlag.NONCE, True)
         return self
 
-    def signature(self, signature: bytes) -> "TransactionBuilder":
+    def signature(self, signature: bytes) -> TransactionBuilder:
         self.add(Key.SIGNATURE, signature)
         self._set_flag(KeyFlag.SIGNATURE, True)
         return self
 
-    def data_type(self, data_type: str) -> "TransactionBuilder":
+    def data_type(self, data_type: str) -> TransactionBuilder:
         self.add(Key.DATA_TYPE, data_type)
         self._set_flag(KeyFlag.DATA_TYPE, True)
         return self
 
-    def data(self, data: Union[Dict[str, Any], str]) -> "TransactionBuilder":
+    def data(self, data: Union[Dict[str, Any], str]) -> TransactionBuilder:
         self.add(Key.DATA, data)
         self._set_flag(KeyFlag.DATA, True)
         return self
@@ -156,12 +157,14 @@ class MessageTransactionBuilder(TransactionBuilder):
         super().__init__()
 
     def data_type(self, data_type: str):
-        raise BuilderException(f"data_type() is not allowed in {self.__class__.__name__}")
+        raise BuilderException(
+            f"data_type() is not allowed in {self.__class__.__name__}"
+        )
 
     def data(self, data: Union[Dict[str, Any], str]):
         raise BuilderException(f"data() is not allowed in {self.__class__.__name__}")
 
-    def message_data(self, data: bytes) -> "MessageTransactionBuilder":
+    def message_data(self, data: bytes) -> MessageTransactionBuilder:
         self.add(Key.DATA_TYPE, "message")
         self.add(Key.DATA, bytes_to_hex(data))
         return self
@@ -172,14 +175,16 @@ class CallTransactionBuilder(TransactionBuilder):
         super().__init__()
 
     def data_type(self, data_type: str):
-        raise BuilderException(f"data_type() is not allowed in {self.__class__.__name__}")
+        raise BuilderException(
+            f"data_type() is not allowed in {self.__class__.__name__}"
+        )
 
     def data(self, data: Union[Dict[str, Any], str]):
         raise BuilderException(f"data() is not allowed in {self.__class__.__name__}")
 
     def call_data(
         self, method: str, params: Optional[Dict[str, str]]
-    ) -> "CallTransactionBuilder":
+    ) -> CallTransactionBuilder:
         data = {"method": method}
         if isinstance(params, dict):
             data["params"] = params
@@ -194,14 +199,16 @@ class DeployTransactionBuilder(TransactionBuilder):
         super().__init__()
 
     def data_type(self, data_type: str):
-        raise BuilderException(f"data_type() is not allowed in {self.__class__.__name__}")
+        raise BuilderException(
+            f"data_type() is not allowed in {self.__class__.__name__}"
+        )
 
     def data(self, data: Union[Dict[str, Any], str]):
         raise BuilderException(f"data() is not allowed in {self.__class__.__name__}")
 
     def deploy_data_from_bytes(
         self, data: bytes, params: Optional[Dict[str, Any]]
-    ) -> "DeployTransactionBuilder":
+    ) -> DeployTransactionBuilder:
         deploy_data = {"content": data, "contentType": "application/zip"}
 
         if params:
@@ -216,6 +223,6 @@ class DeployTransactionBuilder(TransactionBuilder):
 
     def deploy_data_from_path(
         self, path: str, params: Optional[Dict[str, Any]]
-    ) -> "DeployTransactionBuilder":
+    ) -> DeployTransactionBuilder:
         data: bytes = gen_deploy_data_content(path)
         return self.deploy_data_from_bytes(data, params)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__all__ = "CallBuilder"
+from __future__ import annotations
 
 from typing import Dict, Optional, Any
 
@@ -13,15 +13,15 @@ class CallBuilder(GenericBuilder):
     def __init__(self):
         super().__init__()
 
-    def from_(self, address: Address) -> "CallBuilder":
+    def from_(self, address: Address) -> CallBuilder:
         self.add(Key.FROM, address)
         return self
 
-    def to(self, address: Address) -> "CallBuilder":
+    def to(self, address: Address) -> CallBuilder:
         self.add(Key.TO, address)
         return self
 
-    def call_data(self, method: str, params: Optional[Dict[str, Any]]) -> "CallBuilder":
+    def call_data(self, method: str, params: Optional[Dict[str, Any]]) -> CallBuilder:
         data = {"method": method}
         if isinstance(params, dict):
             data["params"] = params

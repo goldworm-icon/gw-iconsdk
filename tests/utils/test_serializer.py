@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from typing import Dict
-
-import pytest
-
-from icon.utils.serializer import generate_message
+from icon.builder.transaction_builder import TransactionBuilder, Transaction
 from icon.data.address import AddressPrefix, Address
-from icon.builder.transaction_builder import TransactionBuilder
+from icon.utils.serializer import generate_message
 
 
 class TestSerializer(object):
@@ -16,6 +12,7 @@ class TestSerializer(object):
             Address.from_int(AddressPrefix.CONTRACT, 0)
         ).value(0).step_limit(1_000_000).nonce(0)
 
-        params: Dict[str, str] = builder.build()
-        message: str = generate_message(params)
-        print(message)
+        tx: Transaction = builder.build()
+        message: str = generate_message(tx)
+        assert isinstance(message, str)
+        assert message.startswith("icx_sendTransaction")

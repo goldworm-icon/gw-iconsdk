@@ -29,7 +29,7 @@ __all__ = (
 
 from typing import Optional, Any, Dict, List, Union
 
-from icon.data.address import Address
+from .address import Address
 
 
 def str_to_int(value: str) -> int:

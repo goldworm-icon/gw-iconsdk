@@ -13,13 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 from typing import List, Dict, Tuple, Union
 
 from .address import Address
-from icon.data.utils import str_to_base_object_by_typename, base_object_to_str
+from ..data.utils import str_to_base_object_by_typename, base_object_to_str
 
 
-class EventLog(object):
+class Eventlog(object):
     def __init__(self, score_address: Address, indexed: List, data: List):
         self._score_address: Address = score_address
         self._indexed = indexed
@@ -51,7 +53,7 @@ class EventLog(object):
         return self._data
 
     @classmethod
-    def from_dict(cls, event_log: Dict) -> "EventLog":
+    def from_dict(cls, event_log: Dict) -> Eventlog:
         score_address = Address.from_string(event_log["scoreAddress"])
         indexed = event_log["indexed"]
         data = event_log["data"]
@@ -71,7 +73,7 @@ class EventLog(object):
             data[i] = str_to_base_object_by_typename(types[index], data[i])
             index += 1
 
-        return EventLog(score_address, indexed, data)
+        return Eventlog(score_address, indexed, data)
 
     @classmethod
     def parse_signature(cls, signature: str) -> Tuple[str, List[str]]:
@@ -80,6 +82,6 @@ class EventLog(object):
 
         index = signature.index("(")
         name = signature[:index]
-        params = signature[index + 1 : -1].split(",")
+        params = signature[index + 1: -1].split(",")
 
         return name, params

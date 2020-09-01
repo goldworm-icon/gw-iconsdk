@@ -15,7 +15,7 @@
 
 from typing import Dict, Any
 
-from icon.data.utils import to_str_dict
+from ..data.utils import to_str_dict
 
 
 class GenericBuilder(object):
