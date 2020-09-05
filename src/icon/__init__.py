@@ -14,4 +14,7 @@
 # limitations under the License.
 
 
+from icon.exception import *
+from icon.wallet import *
+
 from .client import Client

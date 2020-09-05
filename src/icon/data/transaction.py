@@ -9,17 +9,46 @@ from typing import Optional, Dict, Union, Any
 
 from .address import Address
 from .utils import str_to_int, hex_to_bytes, bytes_to_hex
+from ..builder.key import Key
 from ..exception import JSONRPCException
 
 
 class DataType(IntEnum):
-    NONE = auto()
+    BASE = auto()
     CALL = auto()
     DEPLOY = auto()
     MESSAGE = auto()
+    NONE = auto()
 
     def __str__(self) -> str:
         return self.name.lower()
+
+
+def get_transaction(data: Dict[str, Any]) -> Union[Transaction, BaseTransaction]:
+    data_type: str = data.get(Key.DATA_TYPE, "")
+    if data_type == "base":
+        return BaseTransaction.from_dict(data)
+    else:
+        return Transaction.from_dict(data)
+
+
+class _JSONEncoder(json.JSONEncoder):
+    def default(self, o: Any) -> Any:
+        if isinstance(o, Address):
+            return str(o)
+        elif isinstance(o, bytes):
+            return bytes_to_hex(o)
+
+        return json.JSONEncoder.default(self, o)
+
+
+def _default(o: Any) -> Any:
+    if isinstance(o, Address):
+        return str(o)
+    elif isinstance(o, bytes):
+        return bytes_to_hex(o)
+
+    return o
 
 
 class Transaction(object):
@@ -35,14 +64,14 @@ class Transaction(object):
         step_limit: int,
         timestamp: int,
         signature: bytes,
-        block_height: int,
-        block_hash: bytes,
-        tx_hash: bytes,
-        tx_index: int,
+        block_height: int = None,
+        block_hash: bytes = None,
+        tx_hash: bytes = None,
+        tx_index: int = None,
         value: int = 0,
         nonce: Optional[int] = None,
         data_type: Optional[str] = None,
-        data: Optional[Union[str, Dict]] = None,
+        data: Optional[Union[str, Dict[str, Any]]] = None,
     ) -> None:
         """Transaction class for icon score context
         """
@@ -62,25 +91,8 @@ class Transaction(object):
         self._data_type = data_type
         self._data = data
 
-    def __str__(self):
-        items = (
-            f"version={self._version}",
-            f"nid={self._nid}",
-            f"block_hash={bytes_to_hex(self._block_hash)}",
-            f"block_height={self._block_height}",
-            f"tx_hash={bytes_to_hex(self._tx_hash)}",
-            f"tx_index={self._tx_index}",
-            f"from={self._from}",
-            f"to={self._to}",
-            f"value={self._value}",
-            f"step_limit={self._step_limit}",
-            f"timestamp={self._timestamp}",
-            f"signature={bytes_to_hex(self._signature)}",
-            f"data_type={self._data_type}",
-            f"data={self._data}",
-        )
-
-        return "\n".join(items)
+    def __repr__(self):
+        return json.dumps(self.to_dict(), indent=4, default=_default)
 
     @property
     def version(self) -> int:
@@ -164,17 +176,43 @@ class Transaction(object):
         data = json.loads(data)
         return cls.from_dict(data)
 
+    def to_dict(self) -> Dict[str, Any]:
+        ret = {
+            "version": self._version,
+            "nid": self._nid,
+            "from": self._from,
+            "to": self._to,
+            "value": self._value,
+            "stepLimit": self._step_limit,
+            "timestamp": self._timestamp,
+            "signature": bytes_to_hex(self._signature),
+        }
+
+        keys = (
+            "nonce", "dataType", "data",
+            "txIndex", "txHash", "blockHeight", "blockHash"
+        )
+        values = (
+            self._nonce, self._data_type, self._data,
+            self._tx_index, self._tx_hash, self._block_height, self._block_hash
+        )
+        for key, value in zip(keys, values):
+            if value is not None:
+                ret[key] = value
+
+        return ret
+
     @classmethod
     def from_dict(cls, tx_dict: Dict[str, str]) -> Transaction:
         version = str_to_int(tx_dict["version"])
-        nid = str_to_int(tx_dict["nid"])
+        nid = str_to_int(tx_dict.get("nid", "0x0"))
         from_ = Address.from_string(tx_dict["from"])
         to = Address.from_string(tx_dict["to"])
         value = str_to_int(tx_dict.get("value", "0x0"))
-        tx_index = str_to_int(tx_dict["txIndex"])
-        tx_hash = hex_to_bytes(tx_dict["txHash"])
-        block_height = str_to_int(tx_dict["blockHeight"])
-        block_hash = hex_to_bytes(tx_dict["blockHash"])
+        tx_index = str_to_int(tx_dict["txIndex"]) if "txIndex" in tx_dict else None
+        tx_hash = hex_to_bytes(tx_dict["txHash"]) if "txHash" in tx_dict else None
+        block_height = str_to_int(tx_dict["blockHeight"]) if "blockHeight" in tx_dict else None
+        block_hash = hex_to_bytes(tx_dict["blockHash"]) if "blockHash" in tx_dict else None
         step_limit = str_to_int(tx_dict["stepLimit"])
         timestamp = cls._get_timestamp(tx_dict)
         signature: bytes = base64.b64decode(tx_dict["signature"])
@@ -215,3 +253,134 @@ class Transaction(object):
     @staticmethod
     def _get_data(tx_dict: Dict[str, str]) -> Any:
         return tx_dict.get("data")
+
+
+class BaseTransaction(object):
+
+    class PRep(object):
+        def __init__(self, irep: int, rrep: int, total_delegation: int, value: int):
+            self._irep = irep
+            self._rrep = rrep
+            self._total_delegation = total_delegation
+            self._value = value
+
+        def __repr__(self):
+            return str(self.to_dict())
+
+        @property
+        def irep(self) -> int:
+            return self._irep
+
+        @property
+        def rrep(self) -> int:
+            return self._rrep
+
+        @property
+        def total_delegation(self) -> int:
+            return self._total_delegation
+
+        @property
+        def value(self) -> int:
+            return self._value
+
+        def to_dict(self) -> Dict[str, Any]:
+            return {
+                "irep": self._irep,
+                "rrep": self._rrep,
+                "totalDelegation": self._total_delegation,
+                "value": self._value
+            }
+
+        @classmethod
+        def from_dict(cls, data: Dict[str, Any]) -> BaseTransaction.PRep:
+            return cls(
+                irep=str_to_int(data["irep"]),
+                rrep=str_to_int(data["rrep"]),
+                total_delegation=str_to_int(data["totalDelegation"]),
+                value=str_to_int(data["value"])
+            )
+
+    class Result(object):
+        def __init__(self, covered_by_fee: int, covered_by_over_issued_icx: int, issue: int):
+            self._covered_by_fee = covered_by_fee
+            self._covered_by_over_issued_icx = covered_by_over_issued_icx
+            self._issue = issue
+
+        def __repr__(self) -> str:
+            return str(self.to_dict())
+
+        @property
+        def covered_by_fee(self) -> int:
+            return self._covered_by_fee
+
+        @property
+        def covered_by_over_issued_icx(self) -> int:
+            return self._covered_by_over_issued_icx
+
+        @property
+        def issue(self) -> int:
+            return self._issue
+
+        def to_dict(self) -> Dict[str, Any]:
+            return {
+                "coveredByFee": self._covered_by_fee,
+                "coveredByOverIssuedICX": self._covered_by_over_issued_icx,
+                "issue": self._issue
+            }
+
+        @classmethod
+        def from_dict(cls, data: Dict[str, Any]) -> BaseTransaction.Result:
+            return cls(
+                covered_by_fee=str_to_int(data["coveredByFee"]),
+                covered_by_over_issued_icx=str_to_int(data["coveredByOverIssuedICX"]),
+                issue=str_to_int(data["issue"])
+            )
+
+    def __init__(self, version: int, timestamp: int, data_type: str, data: Dict[str, Any]):
+        self._version = version
+        self._timestamp = timestamp
+        self._data_type = data_type
+        self._data = data
+
+    def __repr__(self) -> str:
+        data: Dict[str, Any] = self.to_dict()
+        return json.dumps(data, indent=4)
+
+    @property
+    def version(self) -> version:
+        return self._version
+
+    @property
+    def timestamp(self) -> int:
+        return self._timestamp
+
+    @property
+    def data_type(self) -> str:
+        return self._data_type
+
+    @property
+    def data(self) -> Dict[str, Any]:
+        return self._data
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "version": self._version,
+            "timestamp": self._timestamp,
+            "dataType": self._data_type,
+            "data": {
+                "prep": self._data["prep"].to_dict(),
+                "result": self._data["result"].to_dict(),
+            }
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> BaseTransaction:
+        return cls(
+            version=str_to_int(data["version"]),
+            timestamp=str_to_int(data["timestamp"]),
+            data_type=data["dataType"],
+            data={
+                "prep": BaseTransaction.PRep.from_dict(data["data"]["prep"]),
+                "result": BaseTransaction.Result.from_dict(data["data"]["result"])
+            }
+        )

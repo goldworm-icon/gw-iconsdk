@@ -6,12 +6,12 @@
 
 * [coincurve](https://pypi.org/project/coincurve/)
 * [eth_keyfile](https://github.com/ethereum/eth-keyfile)
-* [multipledispatch](https://pypi.org/project/multipledispatch/)
+* [multimethod](https://pypi.org/project/multimethod/)
 * [requests](https://pypi.org/project/requests/)
 
 # Installation
 
-```
+```bash
 $ pip install gw-iconsdk
 ```
 
@@ -20,25 +20,29 @@ $ pip install gw-iconsdk
 ## send_transaction
 
 ```python
-from typing import Dict
-
 import icon
+import icon.builder
+from icon.data import unit, Address
+from icon.provider import HTTPProvider
+from icon.wallet import KeyWallet
 
-provider = icon.HttpProvider()
+
+provider = HTTPProvider("http://localhost:9000", 3)
 client = icon.Client(provider)
-wallet = icon.KeyWallet()
-to: icon.Address = icon.Address.from_string("hx0123456789012345678901234567890123456789")
+wallet = KeyWallet()
+to = Address.from_string("hx0123456789012345678901234567890123456789")
 
 try:
-    params: Dict[str, str] = icon.TransactionBuilder() \
+    tx: icon.builder.Transaction = icon.builder.TransactionBuilder() \
         .from_(wallet.address) \
         .to(to) \
-        .value(10 * 10 ** 18) \
+        .value(unit.icx(10)) \
         .step_limit(100_000) \
         .nonce(0) \
         .build()
+    tx.sign(wallet.private_key)
 
-    tx_hash: bytes = client.send_transaction(params, wallet.private_key)
+    tx_hash: bytes = client.send_transaction(tx)
 except icon.SDKException as e:
     print(e)
 ```
@@ -52,7 +56,7 @@ from typing import Dict
 
 import icon
 
-provider = icon.HttpProvider("https://localhost:9000")
+provider = icon.HTTPProvider("https://localhost:9000")
 client = icon.Client(provider)
 wallet = icon.KeyWallet()
 to = icon.Address.from_string("hx0123456789012345678901234567890123456789")
