@@ -39,7 +39,9 @@ def _get_signature(block_dict: dict) -> bytes:
     return base64.standard_b64decode(value)
 
 
-def _get_transactions(block_dict: Dict[str, Any]) -> List[Union[BaseTransaction, Transaction]]:
+def _get_transactions(
+    block_dict: Dict[str, Any]
+) -> List[Union[BaseTransaction, Transaction]]:
     key = "confirmed_transaction_list"
     return [get_transaction(tx_dict) for tx_dict in block_dict[key]]
 
@@ -137,7 +139,7 @@ class Block(object):
             "timestamp": self._timestamp,
             "peer_id": self._peer_id,
             "signature": self._signature,
-            "transactions": self._transactions
+            "transactions": self._transactions,
         }
 
         if self._next_leader:
@@ -170,5 +172,5 @@ class Block(object):
             peer_id=peer_id,
             next_leader=next_leader,
             signature=signature,
-            transactions=transactions
+            transactions=transactions,
         )

@@ -10,7 +10,7 @@ from .data.address import Address
 from .data.block import Block
 from .data.rpc_request import RpcRequest
 from .data.rpc_response import RpcResponse
-from .data.transaction import Transaction
+from .data.transaction import Transaction, BaseTransaction, get_transaction
 from .data.transaction_result import TransactionResult
 from .data.utils import str_to_int, bytes_to_hex, hex_to_bytes
 from .exception import (
@@ -45,11 +45,13 @@ class Client(object):
         response = self.send_request(request, **kwargs)
         return Block.from_dict(response.result)
 
-    def get_transaction(self, tx_hash: bytes, **kwargs) -> Transaction:
+    def get_transaction(
+        self, tx_hash: bytes, **kwargs
+    ) -> Union[Transaction, BaseTransaction]:
         params = {"txHash": bytes_to_hex(tx_hash)}
         request = RpcRequest(Method.GET_TRANSACTION_BY_HASH, params)
         response = self.send_request(request, **kwargs)
-        return Transaction.from_dict(response.result)
+        return get_transaction(response.result)
 
     def get_transaction_result(self, tx_hash: bytes, **kwargs) -> TransactionResult:
         params = {"txHash": bytes_to_hex(tx_hash)}

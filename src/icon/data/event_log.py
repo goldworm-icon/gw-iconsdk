@@ -15,26 +15,30 @@
 
 from __future__ import annotations
 
-from typing import List, Dict, Tuple, Union
+import json
+from typing import List, Dict, Tuple, Union, Any
 
 from .address import Address
-from ..data.utils import str_to_base_object_by_typename, base_object_to_str
+from ..data.utils import str_to_base_object_by_typename, bytes_to_hex
 
 
-class Eventlog(object):
+def _default(o: Any) -> str:
+    if isinstance(o, Address):
+        return str(o)
+    elif isinstance(o, bytes):
+        return bytes_to_hex(o)
+
+    return o
+
+
+class EventLog(object):
     def __init__(self, score_address: Address, indexed: List, data: List):
         self._score_address: Address = score_address
         self._indexed = indexed
         self._data = data
 
-    def __str__(self):
-        items = (
-            f"scoreAddress={self._score_address}",
-            f"indexed={[base_object_to_str(item) for item in self._indexed]}",
-            f"data={[base_object_to_str(item) for item in self._data]}",
-        )
-
-        return ", ".join(items)
+    def __repr__(self):
+        return json.dumps(self.to_dict(), indent=4, default=_default)
 
     @property
     def signature(self) -> str:
@@ -52,8 +56,15 @@ class Eventlog(object):
     def data(self) -> List[Union[Address, int, str]]:
         return self._data
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "scoreAddress": self._score_address,
+            "indexed": self._indexed,
+            "data": self._data,
+        }
+
     @classmethod
-    def from_dict(cls, event_log: Dict) -> Eventlog:
+    def from_dict(cls, event_log: Dict) -> EventLog:
         score_address = Address.from_string(event_log["scoreAddress"])
         indexed = event_log["indexed"]
         data = event_log["data"]
@@ -73,7 +84,7 @@ class Eventlog(object):
             data[i] = str_to_base_object_by_typename(types[index], data[i])
             index += 1
 
-        return Eventlog(score_address, indexed, data)
+        return EventLog(score_address, indexed, data)
 
     @classmethod
     def parse_signature(cls, signature: str) -> Tuple[str, List[str]]:
@@ -82,6 +93,6 @@ class Eventlog(object):
 
         index = signature.index("(")
         name = signature[:index]
-        params = signature[index + 1: -1].split(",")
+        params = signature[index + 1 : -1].split(",")
 
         return name, params

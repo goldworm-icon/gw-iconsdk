@@ -17,12 +17,22 @@ from __future__ import annotations
 
 __all__ = "TransactionResult"
 
+import json
 from enum import IntEnum
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 
 from .address import Address
-from .eventlog import Eventlog
-from .utils import bytes_to_hex, hex_to_bytes, str_to_int
+from .event_log import EventLog
+from .utils import hex_to_bytes, bytes_to_hex, str_to_int
+
+
+def _default(o: Any) -> Any:
+    if isinstance(o, Address):
+        return str(o)
+    elif isinstance(o, bytes):
+        return bytes_to_hex(o)
+
+    return o
 
 
 class TransactionResult(object):
@@ -39,8 +49,8 @@ class TransactionResult(object):
             self._code = code
             self._message = message
 
-        def __str__(self) -> str:
-            return f"Failure(code={self._code}, message={self._message})"
+        def __repr__(self):
+            return json.dumps(self.to_dict(), indent=4)
 
         @property
         def code(self) -> int:
@@ -49,6 +59,9 @@ class TransactionResult(object):
         @property
         def message(self) -> str:
             return self._message
+
+        def to_dict(self) -> Dict[str, Any]:
+            return {"code": self._code, "message": self._message}
 
         @classmethod
         def from_dict(cls, data: Dict[str, str]) -> TransactionResult.Failure:
@@ -71,7 +84,7 @@ class TransactionResult(object):
         step_used: int = -1,
         score_address: Address = None,
         logs_bloom: bytes = None,
-        event_logs: List[Eventlog] = None,
+        event_logs: List[EventLog] = None,
     ):
         self._status: Optional[TransactionResult.Status] = status
         self._failure: Optional[TransactionResult.Failure] = failure
@@ -86,25 +99,10 @@ class TransactionResult(object):
         self._score_address: Optional[Address] = score_address
         self._fee = step_price * step_used
         self._logs_bloom: Optional[bytes] = logs_bloom
-        self._event_logs: List[Eventlog] = [] if event_logs is None else event_logs
+        self._event_logs: List[EventLog] = [] if event_logs is None else event_logs
 
-    def __str__(self):
-        items = (
-            f"status: {self._status}",
-            f"failure: {self._failure}",
-            f"blockHeight: {self._block_height}",
-            f"blockHash: {bytes_to_hex(self._block_hash)}",
-            f"txHash: {bytes_to_hex(self._tx_hash)}",
-            f"txIndex: {self._tx_index}",
-            f"to: {self._to}",
-            f"scoreAddress: {self._score_address}",
-            f"stepPrice: {self._step_price}",
-            f"stepUsed: {self._step_used}",
-            f"fee: {self._fee}",
-            f"eventLogs: {[str(event_log) for event_log in self._event_logs]}",
-        )
-
-        return "\n".join(items)
+    def __repr__(self):
+        return json.dumps(self.to_dict(), indent=4, default=_default)
 
     @property
     def status(self) -> Status:
@@ -159,8 +157,31 @@ class TransactionResult(object):
         return self._logs_bloom
 
     @property
-    def event_logs(self) -> List[Eventlog]:
+    def event_logs(self) -> List[EventLog]:
         return self._event_logs
+
+    def to_dict(self) -> Dict[str, Any]:
+        ret = {
+            "status": self._status,
+            "to": self._to,
+            "blockHeight": self._block_height,
+            "blockHash": self._block_hash,
+            "txIndex": self._tx_index,
+            "txHash": self._tx_hash,
+            "stepPrice": self._step_price,
+            "stepUsed": self._step_used,
+            "fee": self._fee,
+            "cumulativeStepUsed": self._cumulative_step_used,
+            "logsBloom": self._logs_bloom,
+            "eventLogs": [event_log.to_dict() for event_log in self._event_logs],
+        }
+
+        if self._failure is not None:
+            ret["failure"] = self._failure.to_dict()
+        if isinstance(self._score_address, Address):
+            ret["scoreAddress"] = self._score_address
+
+        return ret
 
     @classmethod
     def from_dict(cls, data: dict) -> TransactionResult:
@@ -184,7 +205,7 @@ class TransactionResult(object):
             else None
         )
         logs_bloom: bytes = hex_to_bytes(data.get("logsBloom"))
-        event_logs: List[Eventlog] = cls._parse_event_logs(data["eventLogs"])
+        event_logs: List[EventLog] = cls._parse_event_logs(data["eventLogs"])
 
         return TransactionResult(
             status=status,
@@ -203,9 +224,5 @@ class TransactionResult(object):
         )
 
     @classmethod
-    def _parse_event_logs(cls, event_logs: List[Dict[str, str]]) -> List[Eventlog]:
-        ret = []
-        for log in event_logs:
-            ret.append(Eventlog.from_dict(log))
-
-        return ret
+    def _parse_event_logs(cls, event_logs: List[Dict[str, str]]) -> List[EventLog]:
+        return [EventLog.from_dict(event_log) for event_log in event_logs]

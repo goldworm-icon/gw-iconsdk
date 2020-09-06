@@ -189,12 +189,22 @@ class Transaction(object):
         }
 
         keys = (
-            "nonce", "dataType", "data",
-            "txIndex", "txHash", "blockHeight", "blockHash"
+            "nonce",
+            "dataType",
+            "data",
+            "txIndex",
+            "txHash",
+            "blockHeight",
+            "blockHash",
         )
         values = (
-            self._nonce, self._data_type, self._data,
-            self._tx_index, self._tx_hash, self._block_height, self._block_hash
+            self._nonce,
+            self._data_type,
+            self._data,
+            self._tx_index,
+            self._tx_hash,
+            self._block_height,
+            self._block_hash,
         )
         for key, value in zip(keys, values):
             if value is not None:
@@ -211,8 +221,12 @@ class Transaction(object):
         value = str_to_int(tx_dict.get("value", "0x0"))
         tx_index = str_to_int(tx_dict["txIndex"]) if "txIndex" in tx_dict else None
         tx_hash = hex_to_bytes(tx_dict["txHash"]) if "txHash" in tx_dict else None
-        block_height = str_to_int(tx_dict["blockHeight"]) if "blockHeight" in tx_dict else None
-        block_hash = hex_to_bytes(tx_dict["blockHash"]) if "blockHash" in tx_dict else None
+        block_height = (
+            str_to_int(tx_dict["blockHeight"]) if "blockHeight" in tx_dict else None
+        )
+        block_hash = (
+            hex_to_bytes(tx_dict["blockHash"]) if "blockHash" in tx_dict else None
+        )
         step_limit = str_to_int(tx_dict["stepLimit"])
         timestamp = cls._get_timestamp(tx_dict)
         signature: bytes = base64.b64decode(tx_dict["signature"])
@@ -256,7 +270,6 @@ class Transaction(object):
 
 
 class BaseTransaction(object):
-
     class PRep(object):
         def __init__(self, irep: int, rrep: int, total_delegation: int, value: int):
             self._irep = irep
@@ -288,7 +301,7 @@ class BaseTransaction(object):
                 "irep": self._irep,
                 "rrep": self._rrep,
                 "totalDelegation": self._total_delegation,
-                "value": self._value
+                "value": self._value,
             }
 
         @classmethod
@@ -297,11 +310,13 @@ class BaseTransaction(object):
                 irep=str_to_int(data["irep"]),
                 rrep=str_to_int(data["rrep"]),
                 total_delegation=str_to_int(data["totalDelegation"]),
-                value=str_to_int(data["value"])
+                value=str_to_int(data["value"]),
             )
 
     class Result(object):
-        def __init__(self, covered_by_fee: int, covered_by_over_issued_icx: int, issue: int):
+        def __init__(
+            self, covered_by_fee: int, covered_by_over_issued_icx: int, issue: int
+        ):
             self._covered_by_fee = covered_by_fee
             self._covered_by_over_issued_icx = covered_by_over_issued_icx
             self._issue = issue
@@ -325,7 +340,7 @@ class BaseTransaction(object):
             return {
                 "coveredByFee": self._covered_by_fee,
                 "coveredByOverIssuedICX": self._covered_by_over_issued_icx,
-                "issue": self._issue
+                "issue": self._issue,
             }
 
         @classmethod
@@ -333,10 +348,12 @@ class BaseTransaction(object):
             return cls(
                 covered_by_fee=str_to_int(data["coveredByFee"]),
                 covered_by_over_issued_icx=str_to_int(data["coveredByOverIssuedICX"]),
-                issue=str_to_int(data["issue"])
+                issue=str_to_int(data["issue"]),
             )
 
-    def __init__(self, version: int, timestamp: int, data_type: str, data: Dict[str, Any]):
+    def __init__(
+        self, version: int, timestamp: int, data_type: str, data: Dict[str, Any]
+    ):
         self._version = version
         self._timestamp = timestamp
         self._data_type = data_type
@@ -370,7 +387,7 @@ class BaseTransaction(object):
             "data": {
                 "prep": self._data["prep"].to_dict(),
                 "result": self._data["result"].to_dict(),
-            }
+            },
         }
 
     @classmethod
@@ -381,6 +398,6 @@ class BaseTransaction(object):
             data_type=data["dataType"],
             data={
                 "prep": BaseTransaction.PRep.from_dict(data["data"]["prep"]),
-                "result": BaseTransaction.Result.from_dict(data["data"]["result"])
-            }
+                "result": BaseTransaction.Result.from_dict(data["data"]["result"]),
+            },
         )
