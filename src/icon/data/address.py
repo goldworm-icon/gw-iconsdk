@@ -176,3 +176,4 @@ class Address(object):
 
 SYSTEM_SCORE_ADDRESS = Address.from_int(AddressPrefix.CONTRACT, 0)
 GOVERNANCE_SCORE_ADDRESS = Address.from_int(AddressPrefix.CONTRACT, 1)
+TREASURY_ADDRESS = Address.from_string("hx1000000000000000000000000000000000000000")
