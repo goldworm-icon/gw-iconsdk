@@ -134,7 +134,7 @@ class KeyWallet(Wallet):
         except FileNotFoundError:
             raise KeyStoreException("File not found")
         except IsADirectoryError:
-            raise KeyStoreException("Directory is invalid")
+            raise KeyStoreException("Invalid directory")
 
     def sign(self, message_hash: bytes, recoverable: bool) -> bytes:
         """Generates signature with message_hash

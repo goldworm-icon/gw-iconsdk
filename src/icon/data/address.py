@@ -24,6 +24,7 @@ __all__ = (
     "Address",
     "SYSTEM_SCORE_ADDRESS",
     "GOVERNANCE_SCORE_ADDRESS",
+    "TREASURY_ADDRESS",
 )
 
 import hashlib
