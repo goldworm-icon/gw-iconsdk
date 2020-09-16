@@ -145,7 +145,7 @@ class TransactionBuilder(GenericBuilder):
 
     def build(self) -> Transaction:
         if Key.TIMESTAMP not in self._params:
-            time_us = time_ns() * 1000
+            time_us = time_ns() // 1000
             self.timestamp(time_us)
 
         params: Dict[str, str] = super().build()
