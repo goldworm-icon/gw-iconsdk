@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from typing import Dict, Union, List, Callable, Optional
+from urllib.parse import urlparse
 
 from multimethod import multimethod
 
@@ -18,6 +19,7 @@ from .exception import (
     HookException,
     JSONRPCException,
 )
+from .provider.http_provider import HTTPProvider
 from .provider.provider import Provider
 
 
@@ -128,6 +130,12 @@ class Client(object):
         response = self.send_request(request, **kwargs)
         return response.result
 
+    def get_account(self, address: Address, _filter: int, **kwargs) -> Dict[str, str]:
+        params = {"address": str(address), "filter": hex(_filter)}
+        request = RpcRequest(Method.GET_ACCOUNT, params)
+        response = self.send_request(request, **kwargs)
+        return response.result
+
     @multimethod
     def send_request(self, request: RpcRequest, **kwargs) -> RpcResponse:
         hooks: Dict[str, Union[Callable, List[Callable]]] = kwargs.get("hooks")
@@ -166,8 +174,13 @@ class Client(object):
                 hooks = [hooks]
 
             for hook in hooks:
-                ret: bool = hook(hook_data)
-                if not ret:
+                ret: Optional[bool] = hook(hook_data)
+                if ret is False:
                     return False
 
         return True
+
+
+def create_client(url: str, version: int = 3) -> Client:
+    o = urlparse(url)
+    return Client(HTTPProvider(f"{o.scheme}://{o.netloc}", version))

@@ -57,7 +57,10 @@ class HTTPProvider(Provider):
         return rpc_response
 
     def _get_url(self, method: str) -> str:
-        return self._debug_url if method == Method.ESTIMATE_STEP else self._url
+        if method in {Method.ESTIMATE_STEP, Method.GET_ACCOUNT}:
+            return self._debug_url
+
+        return self._url
 
     @staticmethod
     def _dispatch_hook(key: str, hooks, hook_data: requests.Response):

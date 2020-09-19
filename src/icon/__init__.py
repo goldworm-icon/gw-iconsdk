@@ -17,4 +17,4 @@
 from icon.exception import *
 from icon.wallet import *
 
-from .client import Client
+from .client import Client, create_client

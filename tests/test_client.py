@@ -84,7 +84,7 @@ class TestClient(object):
 
         value = random.randint(0, 9999)
         dummy_response = RpcResponse(
-            json={"jsonrpc": "2.0", "id": 0, "result": hex(value)}
+            json_text={"jsonrpc": "2.0", "id": 0, "result": hex(value)}
         )
 
         dummy_provider.response = dummy_response
@@ -115,7 +115,7 @@ class TestClient(object):
 
         value = random.randint(0, 9999)
         dummy_response = RpcResponse(
-            json={"jsonrpc": "2.0", "id": 0, "result": hex(value)}
+            json_text={"jsonrpc": "2.0", "id": 0, "result": hex(value)}
         )
 
         dummy_provider.response = dummy_response

@@ -20,6 +20,8 @@ class Method(object):
     GET_TOTAL_SUPPLY = "icx_getTotalSupply"
 
     ESTIMATE_STEP = "debug_estimateStep"
+    GET_ACCOUNT = "debug_getAccount"
+
     SEND_TRANSACTION = "icx_sendTransaction"
 
     GET_STATUS = "ise_getStatus"
