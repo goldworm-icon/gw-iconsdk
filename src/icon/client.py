@@ -67,6 +67,20 @@ class Client(object):
         response = self.send_request(request, **kwargs)
         return TransactionResult.from_dict(response.result)
 
+    def get_transaction_result_with_timeout(self, tx_hash: bytes, **kwargs) -> TransactionResult:
+        timeout_ms: int = kwargs.get("timeout_ms", 0)
+
+        try_count = max(timeout_ms // self._BLOCK_GENERATION_INTERVAL_MS, 1)
+        for i in range(try_count):
+            time.sleep(self._BLOCK_GENERATION_INTERVAL_MS // 1000)
+
+            try:
+                return self.get_transaction_result(tx_hash, **kwargs)
+            except SDKException as e:
+                # If this is the last try
+                if i == try_count - 1:
+                    raise e
+
     def get_total_supply(self, **kwargs) -> int:
         request = RpcRequest(Method.GET_TOTAL_SUPPLY)
         response = self.send_request(request, **kwargs)
@@ -115,7 +129,6 @@ class Client(object):
 
     def send_transaction_and_wait(self, tx: builder.Transaction, **kwargs) -> TransactionResult:
         step_limit: int = kwargs.get("step_limit", 0)
-        timeout_ms: int = kwargs.get("timeout_ms", 6000)
 
         if not isinstance(step_limit, int) or step_limit <= 0:
             _builder = GenericBuilder(tx.to_dict())
@@ -129,17 +142,7 @@ class Client(object):
             tx: builder.Transaction = builder.Transaction(params)
 
         tx_hash: bytes = self.send_transaction(tx, **kwargs)
-
-        try_count = max(timeout_ms // self._BLOCK_GENERATION_INTERVAL_MS, 1)
-        for i in range(try_count):
-            time.sleep(self._BLOCK_GENERATION_INTERVAL_MS // 1000)
-
-            try:
-                return self.get_transaction_result(tx_hash, **kwargs)
-            except SDKException as e:
-                # If this is the last try
-                if i == try_count - 1:
-                    raise e
+        return self.get_transaction_result_with_timeout(tx_hash, **kwargs)
 
     def _send_transaction(self, tx: builder.Transaction, **kwargs) -> bytes:
         request = RpcRequest(Method.SEND_TRANSACTION, tx.to_dict())
