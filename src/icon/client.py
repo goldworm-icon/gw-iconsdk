@@ -28,6 +28,8 @@ from .provider.provider import Provider
 
 
 class Client(object):
+    _BLOCK_GENERATION_INTERVAL_MS = 2000
+
     def __init__(self, provider: Provider):
         self._provider = provider
 
@@ -98,7 +100,7 @@ class Client(object):
         response = self.send_request(request, **kwargs)
         return response.result
 
-    def send_transaction(self, tx: builder.Transaction, **kwargs) -> Union[int, bytes]:
+    def send_transaction(self, tx: builder.Transaction, **kwargs) -> bytes:
         if not isinstance(tx, builder.Transaction):
             ValueError(f"Invalid params: tx={tx}")
 
@@ -109,12 +111,7 @@ class Client(object):
         if Key.SIGNATURE not in tx:
             raise ArgumentException(f"Signature not found")
 
-        if kwargs.get("estimate", False):
-            ret: int = self.estimate_step(tx, **kwargs)
-        else:
-            ret: bytes = self._send_transaction(tx, **kwargs)
-
-        return ret
+        return self._send_transaction(tx, **kwargs)
 
     def send_transaction_and_wait(self, tx: builder.Transaction, **kwargs) -> TransactionResult:
         step_limit: int = kwargs.get("step_limit", 0)
@@ -133,10 +130,9 @@ class Client(object):
 
         tx_hash: bytes = self.send_transaction(tx, **kwargs)
 
-        block_generation_interval_ms = 2000
-        try_count = max(timeout_ms // block_generation_interval_ms, 1)
+        try_count = max(timeout_ms // self._BLOCK_GENERATION_INTERVAL_MS, 1)
         for i in range(try_count):
-            time.sleep(block_generation_interval_ms // 1000)
+            time.sleep(self._BLOCK_GENERATION_INTERVAL_MS // 1000)
 
             try:
                 return self.get_transaction_result(tx_hash, **kwargs)
