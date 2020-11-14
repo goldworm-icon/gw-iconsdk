@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ICX_TO_LOOP = 10 ** 18
+LOOP_TO_ISCORE = 1000
 
 
 def icx(value: int) -> int:
@@ -17,3 +18,7 @@ def loop_to_str(value: int) -> str:
         return f"{sign}{integer}.0"
 
     return f"{sign}{integer}.{exponent:018d}"
+
+
+def loop_to_iscore(value: int) -> int:
+    return value * LOOP_TO_ISCORE

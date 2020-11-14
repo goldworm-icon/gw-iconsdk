@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import time
 from typing import Dict, Union, List, Callable, Optional
 from urllib.parse import urlparse
 
 from multimethod import multimethod
 
 from . import builder
+from .builder.generic_builder import GenericBuilder
+from .builder.key import Key
 from .builder.method import Method
 from .data.address import Address
 from .data.block import Block
@@ -18,6 +21,7 @@ from .exception import (
     ArgumentException,
     HookException,
     JSONRPCException,
+    SDKException,
 )
 from .provider.http_provider import HTTPProvider
 from .provider.provider import Provider
@@ -102,12 +106,44 @@ class Client(object):
         if isinstance(private_key, bytes):
             tx.sign(private_key)
 
+        if Key.SIGNATURE not in tx:
+            raise ArgumentException(f"Signature not found")
+
         if kwargs.get("estimate", False):
             ret: int = self.estimate_step(tx, **kwargs)
         else:
             ret: bytes = self._send_transaction(tx, **kwargs)
 
         return ret
+
+    def send_transaction_and_wait(self, tx: builder.Transaction, **kwargs) -> TransactionResult:
+        step_limit: int = kwargs.get("step_limit", 0)
+        timeout_ms: int = kwargs.get("timeout_ms", 6000)
+
+        if not isinstance(step_limit, int) or step_limit <= 0:
+            _builder = GenericBuilder(tx.to_dict())
+            _builder.remove(Key.SIGNATURE)
+            _builder.remove(Key.STEP_LIMIT)
+
+            step_limit: int = self.estimate_step(tx, **kwargs)
+            _builder.add(Key.STEP_LIMIT, step_limit)
+
+            params: Dict[str, str] = _builder.build()
+            tx: builder.Transaction = builder.Transaction(params)
+
+        tx_hash: bytes = self.send_transaction(tx, **kwargs)
+
+        block_generation_interval_ms = 2000
+        try_count = max(timeout_ms // block_generation_interval_ms, 1)
+        for i in range(try_count):
+            time.sleep(block_generation_interval_ms // 1000)
+
+            try:
+                return self.get_transaction_result(tx_hash, **kwargs)
+            except SDKException as e:
+                # If this is the last try
+                if i == try_count - 1:
+                    raise e
 
     def _send_transaction(self, tx: builder.Transaction, **kwargs) -> bytes:
         request = RpcRequest(Method.SEND_TRANSACTION, tx.to_dict())

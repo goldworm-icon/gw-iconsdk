@@ -108,3 +108,8 @@ class BuilderException(SDKException):
 class HookException(SDKException):
     def __init__(self, message: Optional[str], user_data: Any = None):
         super().__init__(SDKException.Code.HOOK_ERROR, message, user_data)
+
+
+class TimeoutException(SDKException):
+    def __init__(self, message: Optional[str], user_data: Any = None):
+        super().__init__(SDKException.Code.HOOK_ERROR, message, user_data)

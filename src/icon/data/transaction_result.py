@@ -105,6 +105,10 @@ class TransactionResult(object):
         return json.dumps(self.to_dict(), indent=4, default=_default)
 
     @property
+    def success(self) -> bool:
+        return self._status == self.Status.SUCCESS
+
+    @property
     def status(self) -> Status:
         return self._status
 

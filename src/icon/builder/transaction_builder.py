@@ -55,6 +55,9 @@ class Transaction(Mapping):
     def __iter__(self) -> Iterator[str]:
         return self._params.__iter__()
 
+    def __contains__(self, key: str) -> bool:
+        return key in self._params
+
     @property
     def tx_hash(self) -> bytes:
         return self._hash
@@ -79,7 +82,6 @@ class TransactionBuilder(GenericBuilder):
     def __init__(self):
         super().__init__()
         self._flags: KeyFlag = KeyFlag.NONE
-
         self.version(PROTO_VERSION)
 
     def _set_flag(self, flag: KeyFlag, on: bool):

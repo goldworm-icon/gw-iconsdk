@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import copy
 from typing import Dict, Any
 
 from ..data.utils import to_str_dict
@@ -31,6 +32,12 @@ class GenericBuilder(object):
     def remove(self, key: str) -> GenericBuilder:
         if key in self._params:
             del self._params[key]
+
+        return self
+
+    def update(self, params: Dict[str, Any]) -> GenericBuilder:
+        for k, v in params.items():
+            self.add(k, copy.deepcopy(v))
 
         return self
 
