@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
-from typing import Dict, Union, List, Callable, Optional
+from typing import Dict, Union, List, Callable, Optional, Any
 from urllib.parse import urlparse
 
 from multimethod import multimethod
@@ -33,41 +33,56 @@ class Client(object):
     def __init__(self, provider: Provider):
         self._provider = provider
 
-    def get_block_by_hash(self, block_hash: bytes, **kwargs) -> Block:
+    def get_block_by_hash(self, block_hash: bytes, **kwargs) -> Union[Block, Dict[str, Any]]:
         params = {"hash": bytes_to_hex(block_hash)}
         request = RpcRequest(Method.GET_BLOCK_BY_HASH, params)
         response = self.send_request(request, **kwargs)
-        return Block.from_dict(response.result)
+        try:
+            return Block.from_dict(response.result)
+        except:
+            return response.result
 
-    def get_block_by_height(self, block_height: int, **kwargs) -> Block:
+    def get_block_by_height(self, block_height: int, **kwargs) -> Union[Block, Dict[str, Any]]:
         if not (isinstance(block_height, int) and block_height >= 0):
             raise ValueError(f"Invalid params: {block_height}")
 
         params = {"height": hex(block_height)}
         request = RpcRequest(Method.GET_BLOCK_BY_HEIGHT, params)
         response = self.send_request(request, **kwargs)
-        return Block.from_dict(response.result)
+        try:
+            return Block.from_dict(response.result)
+        except:
+            return response.result
 
-    def get_last_block(self, **kwargs) -> Block:
+    def get_last_block(self, **kwargs) -> Union[Block, Dict[str, Any]]:
         request = RpcRequest(Method.GET_LAST_BLOCK)
         response = self.send_request(request, **kwargs)
-        return Block.from_dict(response.result)
+        try:
+            return Block.from_dict(response.result)
+        except:
+            return response.result
 
     def get_transaction(
         self, tx_hash: bytes, **kwargs
-    ) -> Union[Transaction, BaseTransaction]:
+    ) -> Union[Transaction, BaseTransaction, Dict[str, Any]]:
         params = {"txHash": bytes_to_hex(tx_hash)}
         request = RpcRequest(Method.GET_TRANSACTION_BY_HASH, params)
         response = self.send_request(request, **kwargs)
-        return get_transaction(response.result)
+        try:
+            return get_transaction(response.result)
+        except:
+            return response.result
 
-    def get_transaction_result(self, tx_hash: bytes, **kwargs) -> TransactionResult:
+    def get_transaction_result(self, tx_hash: bytes, **kwargs) -> Union[TransactionResult, Dict[str, Any]]:
         params = {"txHash": bytes_to_hex(tx_hash)}
         request = RpcRequest(Method.GET_TRANSACTION_RESULT, params)
         response = self.send_request(request, **kwargs)
-        return TransactionResult.from_dict(response.result)
+        try:
+            return TransactionResult.from_dict(response.result)
+        except:
+            return response.result
 
-    def get_transaction_result_with_timeout(self, tx_hash: bytes, **kwargs) -> TransactionResult:
+    def get_transaction_result_with_timeout(self, tx_hash: bytes, **kwargs) -> Union[TransactionResult, Dict[str, Any]]:
         timeout_ms: int = kwargs.get("timeout_ms", 0)
 
         try_count = max(timeout_ms // self._BLOCK_GENERATION_INTERVAL_MS, 1)
@@ -127,7 +142,7 @@ class Client(object):
 
         return self._send_transaction(tx, **kwargs)
 
-    def send_transaction_and_wait(self, tx: builder.Transaction, **kwargs) -> TransactionResult:
+    def send_transaction_and_wait(self, tx: builder.Transaction, **kwargs) -> Union[TransactionResult, Dict[str, Any]]:
         step_limit: int = kwargs.get("step_limit", 0)
 
         if not isinstance(step_limit, int) or step_limit <= 0:

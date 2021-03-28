@@ -188,7 +188,7 @@ class TransactionResult(object):
         return ret
 
     @classmethod
-    def from_dict(cls, data: dict) -> TransactionResult:
+    def from_dict(cls, data: Dict[str, Any]) -> TransactionResult:
         status = TransactionResult.Status(str_to_int(data["status"]))
         failure = (
             TransactionResult.Failure.from_dict(data["failure"])

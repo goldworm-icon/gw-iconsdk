@@ -4,6 +4,7 @@ import json
 import random
 from threading import Lock
 from typing import Optional, Dict, Any
+from .utils import to_str_dict
 
 
 _MAX_ID = 0x7FFFFFFF
@@ -44,7 +45,7 @@ class RpcRequest(object):
         self._url = value
 
     @property
-    def params(self) -> Optional[Dict[str, str]]:
+    def params(self) -> Optional[Dict[str, Any]]:
         return self._params
 
     @property
@@ -66,7 +67,7 @@ class RpcRequest(object):
             "method": self._method,
         }
 
-        if self._params:
-            ret["params"] = self._params
+        if isinstance(self._params, dict):
+            ret["params"] = to_str_dict(self._params)
 
         return ret

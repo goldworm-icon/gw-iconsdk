@@ -26,6 +26,7 @@ class DataType(IntEnum):
 
 def get_transaction(data: Dict[str, Any]) -> Union[Transaction, BaseTransaction]:
     data_type: str = data.get(Key.DATA_TYPE, "")
+
     if data_type == "base":
         return BaseTransaction.from_dict(data)
     else:

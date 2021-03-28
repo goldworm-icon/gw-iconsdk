@@ -27,13 +27,20 @@ class TestClient(object):
     @pytest.mark.parametrize(
         "address, expected_balance",
         [
-            ("hx1b8959dd5c57d2c502e22ee0a887d33baec09091", 907_829_600_000_000_000),
+            ("hx1111111111111111111111111111111111111111", 0),
             ("hxffffffffffffffffffffffffffffffffffffffff", 0),
         ],
     )
     def test_get_balance(self, client, address, expected_balance):
         balance: int = client.get_balance(Address.from_string(address))
         assert balance == expected_balance
+
+    @pytest.mark.parametrize(
+        "block_height", [0, 1, 1_000_000, 10_000_000, 20_000_000, 30_000_000]
+    )
+    def test_get_block(self, client, block_height: int):
+        block = client.get_block_by_height(block_height)
+        assert isinstance(block, (Block, dict))
 
     @pytest.mark.parametrize(
         "tx_hash",
@@ -95,10 +102,10 @@ class TestClient(object):
             balance: int = client.get_balance(address, hooks=hooks)
             assert balance == value
         else:
-            with pytest.raises(HookException) as excinfo:
+            with pytest.raises(HookException) as exc_info:
                 _: int = client.get_balance(address, hooks=hooks)
 
-            e: HookException = excinfo.value
+            e: HookException = exc_info.value
             assert e.code == SDKException.Code.HOOK_ERROR
             assert isinstance(e.user_data, RpcRequest)
 
@@ -126,10 +133,10 @@ class TestClient(object):
             balance: int = client.get_balance(address, hooks=hooks)
             assert balance == value
         else:
-            with pytest.raises(HookException) as excinfo:
+            with pytest.raises(HookException) as exc_info:
                 _: int = client.get_balance(address, hooks=hooks)
 
-            e: HookException = excinfo.value
+            e: HookException = exc_info.value
             assert e.code == SDKException.Code.HOOK_ERROR
             assert isinstance(e.user_data, RpcResponse)
 
