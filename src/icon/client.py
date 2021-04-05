@@ -7,7 +7,6 @@ from urllib.parse import urlparse
 from multimethod import multimethod
 
 from . import builder
-from .builder.generic_builder import GenericBuilder
 from .builder.key import Key
 from .builder.method import Method
 from .data.address import Address
@@ -63,7 +62,7 @@ class Client(object):
             return response.result
 
     def get_transaction(
-        self, tx_hash: bytes, **kwargs
+            self, tx_hash: bytes, **kwargs
     ) -> Union[Transaction, BaseTransaction, Dict[str, Any]]:
         params = {"txHash": bytes_to_hex(tx_hash)}
         request = RpcRequest(Method.GET_TRANSACTION_BY_HASH, params)
@@ -114,7 +113,7 @@ class Client(object):
         return response.result
 
     def get_block(
-        self, value: Union[bytes, int, None] = None, **kwargs
+            self, value: Union[bytes, int, None] = None, **kwargs
     ) -> Dict[str, str]:
         if isinstance(value, bytes):
             params = {"hash": bytes_to_hex(value)}
@@ -143,19 +142,6 @@ class Client(object):
         return self._send_transaction(tx, **kwargs)
 
     def send_transaction_and_wait(self, tx: builder.Transaction, **kwargs) -> Union[TransactionResult, Dict[str, Any]]:
-        step_limit: int = kwargs.get("step_limit", 0)
-
-        if not isinstance(step_limit, int) or step_limit <= 0:
-            _builder = GenericBuilder(tx.to_dict())
-            _builder.remove(Key.SIGNATURE)
-            _builder.remove(Key.STEP_LIMIT)
-
-            step_limit: int = self.estimate_step(tx, **kwargs)
-            _builder.add(Key.STEP_LIMIT, step_limit)
-
-            params: Dict[str, str] = _builder.build()
-            tx: builder.Transaction = builder.Transaction(params)
-
         tx_hash: bytes = self.send_transaction(tx, **kwargs)
         return self.get_transaction_result_with_timeout(tx_hash, **kwargs)
 
@@ -209,7 +195,7 @@ class Client(object):
 
     @multimethod
     def send_request(
-        self, method: str, params: Dict[str, str], **kwargs
+            self, method: str, params: Dict[str, str], **kwargs
     ) -> RpcResponse:
         request = RpcRequest(method, params)
         return self.send_request(request, **kwargs)
