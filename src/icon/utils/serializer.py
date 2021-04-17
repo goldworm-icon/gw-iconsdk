@@ -80,7 +80,7 @@ def generate_message(params: Dict[str, str]) -> str:
     return f"icx_sendTransaction.{partial_serialized_params}"
 
 
-def generate_message_hash(params: dict) -> bytes:
+def generate_message_hash(params: Dict[str, str]) -> bytes:
     """
     Generates transaction"s message hash from params in request for transaction.
 

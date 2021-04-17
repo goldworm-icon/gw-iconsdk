@@ -15,7 +15,12 @@ from .data.rpc_request import RpcRequest
 from .data.rpc_response import RpcResponse
 from .data.transaction import Transaction, BaseTransaction, get_transaction
 from .data.transaction_result import TransactionResult
-from .data.utils import str_to_int, bytes_to_hex, hex_to_bytes
+from .data.utils import (
+    bytes_to_hex,
+    hex_to_bytes,
+    str_to_int,
+    to_str_dict,
+)
 from .exception import (
     ArgumentException,
     HookException,
@@ -24,6 +29,7 @@ from .exception import (
 )
 from .provider.http_provider import HTTPProvider
 from .provider.provider import Provider
+from .utils.utils import generate_signature
 
 
 class Client(object):
@@ -128,35 +134,43 @@ class Client(object):
         response = self.send_request(request, **kwargs)
         return response.result
 
-    def send_transaction(self, tx: builder.Transaction, **kwargs) -> bytes:
-        if not isinstance(tx, builder.Transaction):
-            ValueError(f"Invalid params: tx={tx}")
+    def send_transaction_and_wait(
+            self, tx: Union[builder.Transaction, Dict[str, Any]], **kwargs
+    ) -> Union[TransactionResult, Dict[str, Any]]:
+        tx_hash: bytes = self.send_transaction(tx, **kwargs)
+        return self.get_transaction_result_with_timeout(tx_hash, **kwargs)
+
+    def send_transaction(self, tx: Union[builder.Transaction, Dict[str, Any]], **kwargs) -> bytes:
+        if isinstance(tx, builder.Transaction):
+            tx = tx.to_dict()
 
         private_key: Optional[bytes] = kwargs.get("private_key")
         if isinstance(private_key, bytes):
-            tx.sign(private_key)
+            tx: Dict[str, str] = to_str_dict(tx)
+            tx[Key.SIGNATURE] = generate_signature(tx, private_key)
 
         if Key.SIGNATURE not in tx:
             raise ArgumentException(f"Signature not found")
 
-        return self._send_transaction(tx, **kwargs)
-
-    def send_transaction_and_wait(self, tx: builder.Transaction, **kwargs) -> Union[TransactionResult, Dict[str, Any]]:
-        tx_hash: bytes = self.send_transaction(tx, **kwargs)
-        return self.get_transaction_result_with_timeout(tx_hash, **kwargs)
-
-    def _send_transaction(self, tx: builder.Transaction, **kwargs) -> bytes:
-        request = RpcRequest(Method.SEND_TRANSACTION, tx.to_dict())
+        request = RpcRequest(Method.SEND_TRANSACTION, tx)
         response = self.send_request(request, **kwargs)
         return hex_to_bytes(response.result)
 
-    def call(self, params: Dict[str, str], **kwargs) -> Union[str, Dict[str, str]]:
+    def call(self, params: Dict[str, Any], **kwargs) -> Union[str, Dict[str, str]]:
         request = RpcRequest(Method.CALL, params)
         response = self.send_request(request, **kwargs)
         return response.result
 
-    def estimate_step(self, tx: builder.Transaction, **kwargs) -> int:
-        request = RpcRequest(Method.ESTIMATE_STEP, tx.to_dict())
+    def estimate_step(self, tx: Union[builder.Transaction, Dict[str, Any]], **kwargs) -> int:
+        if isinstance(tx, builder.Transaction):
+            tx = tx.to_dict()
+
+        if Key.STEP_LIMIT in tx:
+            del tx[Key.STEP_LIMIT]
+        if Key.SIGNATURE in tx:
+            del tx[Key.SIGNATURE]
+
+        request = RpcRequest(Method.ESTIMATE_STEP, tx)
         response = self.send_request(request, **kwargs)
         return str_to_int(response.result)
 

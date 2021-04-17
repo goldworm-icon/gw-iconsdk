@@ -93,6 +93,6 @@ class EventLog(object):
 
         index = signature.index("(")
         name = signature[:index]
-        params = signature[index + 1 : -1].split(",")
+        params = signature[index + 1: -1].split(",")
 
         return name, params

@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from base64 import standard_b64encode
+from typing import Dict
+from .serializer import generate_message_hash
+from .crypto import sign
+
 
 def is_keystore_valid(keystore: dict) -> bool:
     """Checks data in a keystore file is valid.
@@ -25,3 +30,9 @@ def has_keys(target_data: dict, keys: list):
         if key not in target_data:
             return False
     return True
+
+
+def generate_signature(tx: Dict[str, str], private_key: bytes) -> str:
+    tx_hash: bytes = generate_message_hash(tx)
+    signature: bytes = sign(tx_hash, private_key, recoverable=True)
+    return standard_b64encode(signature).decode("utf-8")

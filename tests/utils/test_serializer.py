@@ -13,6 +13,6 @@ class TestSerializer(object):
         ).value(0).step_limit(1_000_000).nonce(0)
 
         tx: Transaction = builder.build()
-        message: str = generate_message(tx)
+        message: str = generate_message(tx.to_dict())
         assert isinstance(message, str)
         assert message.startswith("icx_sendTransaction")
