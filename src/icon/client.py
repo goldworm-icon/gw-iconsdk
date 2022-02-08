@@ -2,15 +2,17 @@
 
 import base64
 import time
-from multimethod import multimethod
 from typing import Dict, Union, List, Callable, Optional, Any
 from urllib.parse import urlparse
+
+from multimethod import multimethod
 
 from . import builder
 from .builder.key import Key
 from .builder.method import Method
 from .data.address import Address
 from .data.block import Block
+from .data.block_header import BlockHeader
 from .data.rpc_request import RpcRequest
 from .data.rpc_response import RpcResponse
 from .data.transaction import Transaction, BaseTransaction, get_transaction
@@ -21,6 +23,7 @@ from .data.utils import (
     str_to_int,
     to_str_dict,
 )
+from .data.validators import Validators
 from .exception import (
     ArgumentException,
     HookException,
@@ -230,8 +233,8 @@ class Client(object):
 
         return True
 
-    def get_data_by_hash(self, hash: bytes, **kwargs) -> bytes:
-        params = {"hash": bytes_to_hex(hash)}
+    def get_data_by_hash(self, data_hash: bytes, **kwargs) -> bytes:
+        params = {"hash": bytes_to_hex(data_hash)}
         request = RpcRequest(Method.GET_DATA_BY_HASH, params)
         response = self.send_request(request, **kwargs)
         return base64.standard_b64decode(response.result)
@@ -247,6 +250,16 @@ class Client(object):
         request = RpcRequest(Method.GET_VOTES_BY_HEIGHT, params)
         response = self.send_request(request, **kwargs)
         return base64.standard_b64decode(response.result)
+
+    def get_validators_by_height(self, height: int, **kwargs) -> Validators:
+        bs: bytes = self.get_block_header_by_height(height - 1, **kwargs)
+        block_header = BlockHeader.from_bytes(bs)
+
+        bs = self.get_data_by_hash(block_header.next_validators_hash, **kwargs)
+        return Validators.from_bytes(bs)
+
+
+class ClientEx()
 
 
 def create_client(url: str, version: int = 3) -> Client:

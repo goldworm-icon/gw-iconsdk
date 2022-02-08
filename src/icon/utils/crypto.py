@@ -2,9 +2,11 @@
 
 __all__ = ("sign", "verify_signature", "create_key_pair", "extract_public_key")
 
-from typing import Tuple
-
 import coincurve
+from typing import (
+    Optional,
+    Tuple,
+)
 
 
 def sign(message_hash: bytes, private_key: bytes, recoverable: bool) -> bytes:
@@ -23,6 +25,16 @@ def sign(message_hash: bytes, private_key: bytes, recoverable: bool) -> bytes:
         return private_key_object.sign_recoverable(message_hash, hasher=None)
     else:
         return private_key_object.sign(message_hash, hasher=None)
+
+
+def recover_key(msg_hash: bytes, signature: bytes, compressed: bool = True) -> Optional[bytes]:
+    if isinstance(msg_hash, bytes) \
+            and len(msg_hash) == 32 \
+            and isinstance(signature, bytes) \
+            and len(signature) == 65:
+        return coincurve.PublicKey.from_signature_and_message(signature, msg_hash, hasher=None).format(compressed)
+
+    return None
 
 
 def verify_signature(signature: bytes, message_hash: bytes, public_key: bytes) -> bool:

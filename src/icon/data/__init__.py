@@ -18,6 +18,7 @@ __all__ = (
     "Address",
     "AddressPrefix",
     "Block",
+    "BlockHeader",
     "EventLog",
     "RpcRequest",
     "RpcResponse",
@@ -45,6 +46,7 @@ from .address import (
     GOVERNANCE_SCORE_ADDRESS,
 )
 from .block import Block
+from .block_header import BlockHeader
 from .event_log import EventLog
 from .rpc_request import RpcRequest
 from .rpc_response import RpcResponse

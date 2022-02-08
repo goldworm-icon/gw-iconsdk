@@ -174,6 +174,13 @@ class Address(object):
     def from_int(cls, prefix: AddressPrefix, value: int) -> Address:
         return Address(prefix, value.to_bytes(20, "big"))
 
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Address:
+        if len(data) == 21:
+            return Address(AddressPrefix(data[0]), data[1:])
+        else:
+            return Address(AddressPrefix.EOA, data)
+
 
 SYSTEM_SCORE_ADDRESS = Address.from_int(AddressPrefix.CONTRACT, 0)
 GOVERNANCE_SCORE_ADDRESS = Address.from_int(AddressPrefix.CONTRACT, 1)

@@ -108,6 +108,8 @@ def str_to_base_object_by_typename(object_type: str, value: str) -> object:
 
 
 def bytes_to_hex(value: bytes, prefix: str = "0x") -> str:
+    if value is None:
+        return None
     return f"{prefix}{value.hex()}"
 
 
