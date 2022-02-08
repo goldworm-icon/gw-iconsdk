@@ -25,3 +25,10 @@ class Method(object):
     SEND_TRANSACTION = "icx_sendTransaction"
 
     GET_STATUS = "ise_getStatus"
+
+    # Extended
+    GET_DATA_BY_HASH = "icx_getDataByHash"
+    GET_BLOCK_HEADER_BY_HEIGHT = "icx_getBlockHeaderByHeight"
+    GET_VOTES_BY_HEIGHT = "icx_getVotesByHeight"
+    GET_PROOF_FOR_RESULT = "icx_getProofForResult"
+    GET_PROOF_FOR_EVENT = "icx_getProofForEvent"

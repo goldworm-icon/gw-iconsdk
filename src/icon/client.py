@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import base64
 import time
+from multimethod import multimethod
 from typing import Dict, Union, List, Callable, Optional, Any
 from urllib.parse import urlparse
-
-from multimethod import multimethod
 
 from . import builder
 from .builder.key import Key
@@ -229,6 +229,24 @@ class Client(object):
                     return False
 
         return True
+
+    def get_data_by_hash(self, hash: bytes, **kwargs) -> bytes:
+        params = {"hash": bytes_to_hex(hash)}
+        request = RpcRequest(Method.GET_DATA_BY_HASH, params)
+        response = self.send_request(request, **kwargs)
+        return base64.standard_b64decode(response.result)
+
+    def get_block_header_by_height(self, height: int, **kwargs) -> bytes:
+        params = {"height": hex(height)}
+        request = RpcRequest(Method.GET_BLOCK_HEADER_BY_HEIGHT, params)
+        response = self.send_request(request, **kwargs)
+        return base64.standard_b64decode(response.result)
+
+    def get_votes_by_height(self, height: int, **kwargs) -> bytes:
+        params = {"height": hex(height)}
+        request = RpcRequest(Method.GET_VOTES_BY_HEIGHT, params)
+        response = self.send_request(request, **kwargs)
+        return base64.standard_b64decode(response.result)
 
 
 def create_client(url: str, version: int = 3) -> Client:

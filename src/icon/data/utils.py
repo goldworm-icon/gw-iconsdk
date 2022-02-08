@@ -82,8 +82,8 @@ def to_str_dict(o: Dict[str, Any]) -> Dict[str, str]:
             value = to_str_dict(value)
         elif isinstance(value, list):
             value = to_str_list(value)
-        elif value is None:
-            del o[key]
+        # elif value is None:
+        #     del o[key]
         else:
             value = base_object_to_str(value)
 
