@@ -20,6 +20,12 @@ class Validators:
     def __str__(self):
         return "\n".join((str(address) for address in self._addresses))
 
+    def __bytes__(self):
+        return rlp.rlp_encode([bytes(address) for address in self._addresses])
+
+    def __eq__(self, other):
+        return isinstance(other, Validators) and bytes(self) == bytes(other)
+
     @property
     def addresses(self) -> Tuple[Address]:
         return self._addresses

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 
 import base64
 import time
@@ -24,6 +25,7 @@ from .data.utils import (
     to_str_dict,
 )
 from .data.validators import Validators
+from .data.vote import Votes
 from .exception import (
     ArgumentException,
     HookException,
@@ -40,6 +42,11 @@ class Client(object):
 
     def __init__(self, provider: Provider):
         self._provider = provider
+        self._ex = ClientEx(self)
+
+    @property
+    def ex(self) -> ClientEx:
+        return self._ex
 
     def get_block_by_hash(self, block_hash: bytes, **kwargs) -> Union[Block, Dict[str, Any]]:
         params = {"hash": bytes_to_hex(block_hash)}
@@ -251,15 +258,26 @@ class Client(object):
         response = self.send_request(request, **kwargs)
         return base64.standard_b64decode(response.result)
 
-    def get_validators_by_height(self, height: int, **kwargs) -> Validators:
-        bs: bytes = self.get_block_header_by_height(height - 1, **kwargs)
-        block_header = BlockHeader.from_bytes(bs)
 
-        bs = self.get_data_by_hash(block_header.next_validators_hash, **kwargs)
+class ClientEx:
+    """Do not use this outside this module
+    """
+    def __init__(self, client: Client):
+        self._client = client
+
+    def get_block_header_by_height(self, height: int, **kwargs) -> BlockHeader:
+        bs: bytes = self._client.get_block_header_by_height(height, **kwargs)
+        return BlockHeader.from_bytes(bs)
+
+    def get_validators_by_height(self, height: int, **kwargs) -> Validators:
+        block_header: BlockHeader = self.get_block_header_by_height(height - 1, **kwargs)
+        bs = self._client.get_data_by_hash(block_header.next_validators_hash, **kwargs)
         return Validators.from_bytes(bs)
 
-
-class ClientEx()
+    def get_votes_by_height(self, height: int, **kwargs) -> Votes:
+        block_header: BlockHeader = self.get_block_header_by_height(height + 1, **kwargs)
+        bs: bytes = self._client.get_data_by_hash(block_header.votes_hash, **kwargs)
+        return Votes.from_bytes(bs)
 
 
 def create_client(url: str, version: int = 3) -> Client:

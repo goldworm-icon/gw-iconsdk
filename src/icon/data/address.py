@@ -134,6 +134,12 @@ class Address(object):
         """
         return f"{str(self.prefix)}{self.body.hex()}"
 
+    def __bytes__(self):
+        return self._prefix.value.to_bytes(1, "big") + self._body
+
+    def __hash__(self):
+        return int.from_bytes(bytes(self), "big")
+
     @property
     def is_contract(self) -> bool:
         """

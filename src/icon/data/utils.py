@@ -165,3 +165,11 @@ def str_to_object_by_type(
         }
 
     raise TypeError(f"Invalid type: {type(value)}, {value}")
+
+
+def bytes_to_int(value: bytes, *args, **kwargs) -> int:
+    return int.from_bytes(value, *args, **kwargs)
+
+
+def int_to_bytes(value: int, *args, **kwargs) -> bytes:
+    return value.to_bytes(*args, **kwargs)

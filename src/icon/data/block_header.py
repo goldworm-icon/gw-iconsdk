@@ -81,10 +81,10 @@ class BlockHeader:
         return self._result
 
     @classmethod
-    def from_bytes(cls, data: bytes) -> Optional[BlockHeader]:
-        if not isinstance(data, bytes) or len(data) < 1:
+    def from_bytes(cls, bs: bytes) -> Optional[BlockHeader]:
+        if not isinstance(bs, bytes) or len(bs) < 1:
             return None
-        return cls(data)
+        return cls(bs)
 
 
 class Result:
