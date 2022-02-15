@@ -6,11 +6,10 @@ import base64
 import json
 from typing import Dict, List, Union, Optional, Any
 
-from icon.data.utils import hex_to_bytes, str_to_int, bytes_to_hex
-
 from .address import Address
 from .transaction import get_transaction, BaseTransaction, Transaction
 from ..builder.key import Key
+from ..utils import hex_to_bytes, str_to_int, bytes_to_hex
 
 
 def _get_timestamp(block_dict: dict) -> int:

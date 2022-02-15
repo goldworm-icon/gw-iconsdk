@@ -23,7 +23,11 @@ from typing import List, Dict, Optional, Any
 
 from .address import Address
 from .event_log import EventLog
-from .utils import hex_to_bytes, bytes_to_hex, str_to_int
+from ..utils import (
+    bytes_to_hex,
+    hex_to_bytes,
+    str_to_int,
+)
 
 
 def _default(o: Any) -> Any:

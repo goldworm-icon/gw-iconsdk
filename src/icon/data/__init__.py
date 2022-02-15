@@ -52,4 +52,3 @@ from .rpc_request import RpcRequest
 from .rpc_response import RpcResponse
 from .transaction import Transaction
 from .transaction_result import TransactionResult
-from .utils import *

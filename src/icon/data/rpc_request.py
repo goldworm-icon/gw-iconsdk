@@ -4,8 +4,8 @@ import json
 import random
 from threading import Lock
 from typing import Optional, Dict, Any
-from .utils import to_str_dict
 
+from ..utils import to_str_dict
 
 _MAX_ID = 0x7FFFFFFF
 

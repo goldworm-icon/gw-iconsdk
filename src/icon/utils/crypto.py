@@ -2,11 +2,12 @@
 
 __all__ = ("sign", "verify_signature", "create_key_pair", "extract_public_key")
 
-import coincurve
 from typing import (
     Optional,
     Tuple,
 )
+
+import coincurve
 
 
 def sign(message_hash: bytes, private_key: bytes, recoverable: bool) -> bytes:

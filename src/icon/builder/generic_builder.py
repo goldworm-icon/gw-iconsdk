@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 from typing import Dict, Any
 
-from ..data.utils import to_str_dict
+from ..utils import to_str_dict
 
 
 class GenericBuilder(object):

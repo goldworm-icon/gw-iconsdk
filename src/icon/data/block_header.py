@@ -5,8 +5,10 @@ import hashlib
 from typing import Optional
 
 from .address import Address
-from .utils import bytes_to_hex
-from ..utils import rlp
+from ..utils import (
+    bytes_to_hex,
+    rlp,
+)
 
 
 class BlockHeader:

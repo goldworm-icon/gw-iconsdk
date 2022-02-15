@@ -14,22 +14,23 @@
 # limitations under the License.
 
 __all__ = (
-    "str_to_int",
-    "bytes_to_hex",
-    "hex_to_bytes",
-    "str_to_int",
-    "str_to_base_object_by_typename",
-    "to_str_list",
-    "to_str_dict",
     "base_object_to_str",
-    "str_to_object_by_type",
-    "str_to_base_object_by_type",
+    "bytes_to_hex",
+    "bytes_to_int",
+    "hex_to_bytes",
+    "int_to_bytes",
     "is_base_object_type",
+    "str_to_base_object_by_type",
+    "str_to_base_object_by_typename",
+    "str_to_int",
+    "str_to_object_by_type",
+    "to_str_dict",
+    "to_str_list",
 )
 
 from typing import Optional, Any, Dict, List, Union
 
-from .address import Address
+from icon.data.address import Address
 
 
 def str_to_int(value: str) -> int:
@@ -92,7 +93,7 @@ def to_str_dict(o: Dict[str, Any]) -> Dict[str, str]:
     return ret
 
 
-def str_to_base_object_by_typename(object_type: str, value: str) -> object:
+def str_to_base_object_by_typename(object_type: str, value: str) -> Union[Address, int, bytes, bool, str]:
     if object_type == "Address":
         return Address.from_string(value)
     if object_type == "int":
@@ -107,7 +108,7 @@ def str_to_base_object_by_typename(object_type: str, value: str) -> object:
     raise TypeError(f"Unknown type: {object_type}")
 
 
-def bytes_to_hex(value: bytes, prefix: str = "0x") -> str:
+def bytes_to_hex(value: bytes, prefix: str = "0x") -> Optional[str]:
     if value is None:
         return None
     return f"{prefix}{value.hex()}"

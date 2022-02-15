@@ -10,10 +10,8 @@ from typing import (
 )
 
 from .address import Address
-from .utils import (
-    bytes_to_hex
-)
 from ..utils import (
+    bytes_to_hex,
     crypto,
     rlp,
 )

@@ -19,7 +19,10 @@ import json
 from typing import List, Dict, Tuple, Union, Any
 
 from .address import Address
-from ..data.utils import str_to_base_object_by_typename, bytes_to_hex
+from ..utils import (
+    bytes_to_hex,
+    str_to_base_object_by_typename,
+)
 
 
 def _default(o: Any) -> str:

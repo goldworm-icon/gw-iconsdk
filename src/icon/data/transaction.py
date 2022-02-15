@@ -8,9 +8,9 @@ from enum import IntEnum, auto
 from typing import Optional, Dict, Union, Any
 
 from .address import Address
-from .utils import str_to_int, hex_to_bytes, bytes_to_hex
 from ..builder.key import Key
 from ..exception import JSONRPCException
+from ..utils import str_to_int, hex_to_bytes, bytes_to_hex
 
 
 class DataType(IntEnum):

@@ -18,12 +18,6 @@ from .data.rpc_request import RpcRequest
 from .data.rpc_response import RpcResponse
 from .data.transaction import Transaction, BaseTransaction, get_transaction
 from .data.transaction_result import TransactionResult
-from .data.utils import (
-    bytes_to_hex,
-    hex_to_bytes,
-    str_to_int,
-    to_str_dict,
-)
 from .data.validators import Validators
 from .data.vote import Votes
 from .exception import (
@@ -34,6 +28,12 @@ from .exception import (
 )
 from .provider.http_provider import HTTPProvider
 from .provider.provider import Provider
+from .utils import (
+    bytes_to_hex,
+    hex_to_bytes,
+    str_to_int,
+    to_str_dict,
+)
 from .utils.utils import generate_signature
 
 
