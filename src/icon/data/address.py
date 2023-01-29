@@ -25,6 +25,7 @@ __all__ = (
     "SYSTEM_SCORE_ADDRESS",
     "GOVERNANCE_SCORE_ADDRESS",
     "TREASURY_ADDRESS",
+    "BURN_ADDRESS",
 )
 
 import hashlib
@@ -191,3 +192,4 @@ class Address(object):
 SYSTEM_SCORE_ADDRESS = Address.from_int(AddressPrefix.CONTRACT, 0)
 GOVERNANCE_SCORE_ADDRESS = Address.from_int(AddressPrefix.CONTRACT, 1)
 TREASURY_ADDRESS = Address.from_string("hx1000000000000000000000000000000000000000")
+BURN_ADDRESS = Address.from_string("hx2000000000000000000000000000000000000000")
