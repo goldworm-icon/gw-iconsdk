@@ -15,7 +15,12 @@ from eth_keyfile import (
 
 from .data.address import Address
 from .exception import KeyStoreException
-from .utils.crypto import sign, verify_signature, create_key_pair
+from .utils.crypto import (
+    create_key_pair,
+    change_public_key_format,
+    sign,
+    verify_signature,
+)
 from .utils.utils import is_keystore_valid
 
 
@@ -35,6 +40,11 @@ class Wallet(metaclass=ABCMeta):
     @property
     @abstractmethod
     def public_key(self) -> bytes:
+        pass
+
+    @property
+    @abstractmethod
+    def compressed_public_key(self) -> bytes:
         pass
 
     @abstractmethod
@@ -57,6 +67,7 @@ class KeyWallet(Wallet):
 
     def __init__(self, private_key: bytes = None):
         self._private_key, self._public_key = create_key_pair(private_key)
+        self._compressed_public_key = change_public_key_format(self._public_key, True)
         self._address = Address.from_public_key(self._public_key)
 
     def __eq__(self, other) -> bool:
@@ -76,6 +87,10 @@ class KeyWallet(Wallet):
     @property
     def public_key(self) -> bytes:
         return self._public_key
+
+    @property
+    def compressed_public_key(self) -> bytes:
+        return self._compressed_public_key
 
     @staticmethod
     def load(file_path: str, password: str) -> KeyWallet:
@@ -170,6 +185,10 @@ class LightWallet(Wallet):
 
     @property
     def public_key(self) -> bytes:
+        raise KeyStoreException("Not supported: public_key")
+
+    @property
+    def compressed_public_key(self) -> bytes:
         raise KeyStoreException("Not supported: public_key")
 
     @property

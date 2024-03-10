@@ -58,7 +58,7 @@ def is_signature_recoverable(signature: bytes) -> bool:
 def create_key_pair(
     private_key: bytes = None, compressed: bool = False
 ) -> Tuple[bytes, bytes]:
-    """
+    """Return private key and public key pair
 
     :param private_key:
     :param compressed: The format of a public key to create
@@ -70,6 +70,11 @@ def create_key_pair(
     public_key: bytes = private_key_object.public_key.format(compressed)
 
     return private_key, public_key
+
+
+def change_public_key_format(public_key: bytes, compressed: bool) -> bytes:
+    public_key_object = coincurve.PublicKey(public_key)
+    return public_key_object.format(compressed)
 
 
 def extract_public_key(private_key: bytes, compressed: bool = False) -> bytes:
