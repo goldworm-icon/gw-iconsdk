@@ -199,6 +199,10 @@ class Client(object):
     @multimethod
     def send_request(self, request: RpcRequest, **kwargs) -> RpcResponse:
         hooks: Dict[str, Union[Callable, List[Callable]]] = kwargs.get("hooks")
+        if "height" in kwargs:
+            height: int = kwargs["height"]
+            if height > -1:
+                request.params["height"] = kwargs["height"]
 
         # hooks for request
         ret: bool = self._dispatch_hook("request", hooks, request)
